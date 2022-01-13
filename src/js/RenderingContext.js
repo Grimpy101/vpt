@@ -16,6 +16,9 @@ constructor(options) {
     this._webglcontextlostHandler = this._webglcontextlostHandler.bind(this);
     this._webglcontextrestoredHandler = this._webglcontextrestoredHandler.bind(this);
 
+    // This was the simplest solution to render it like I wanted to
+    this._generationContainer = options.generationContainer;
+
     Object.assign(this, {
         _resolution : 512,
         _filter     : 'linear'
@@ -228,25 +231,38 @@ _render() {
 
     this._updateMvpInverseMatrix();
 
-    this._renderer.render();
-    this._toneMapper.render();
+    // Now renders volume 9 times, for each box, in designated positions
+    const boxes =  this.generationContainer.boxes;
+    let gen_h = this.generationContainer.html.getBoundingClientRect().height;
+    for (let i = 0; i < boxes.length; i++) {
+        const bb = boxes[i].html.getBoundingClientRect();
+        let x = parseInt(bb.left);
+        let y = parseInt(gen_h - bb.bottom);
+        let w = parseInt(bb.width);
+        let h = parseInt(bb.height);
 
-    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-    const program = this._program;
-    gl.useProgram(program.program);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.bindBuffer(gl.ARRAY_BUFFER, this._clipQuad);
-    const aPosition = program.attributes.aPosition;
-    gl.enableVertexAttribArray(aPosition);
-    gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0);
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, this._toneMapper.getTexture());
-    gl.uniform1i(program.uniforms.uTexture, 0);
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+        this._renderer.setTransferFunction(boxes[i].transferFunctionTexture);
 
-    gl.disableVertexAttribArray(aPosition);
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-    gl.bindTexture(gl.TEXTURE_2D, null);
+        this._renderer.render();
+        this._toneMapper.render();
+
+        gl.viewport(x, y, w, h);
+        const program = this._program;
+        gl.useProgram(program.program);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this._clipQuad);
+        const aPosition = program.attributes.aPosition;
+        gl.enableVertexAttribArray(aPosition);
+        gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this._toneMapper.getTexture());
+        gl.uniform1i(program.uniforms.uTexture, 0);
+        gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+
+        gl.disableVertexAttribArray(aPosition);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+    }
 }
 
 getScale() {

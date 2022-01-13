@@ -16,25 +16,41 @@ constructor() {
     this._handleVolumeLoad = this._handleVolumeLoad.bind(this);
     this._handleEnvmapLoad = this._handleEnvmapLoad.bind(this);
 
-    this._renderingContext = new RenderingContext();
+    // This is new, boxes to mark generated selection containers
+    this._generationContainer = new GenerationContainer();
+    this._generationContainer.appendTo(document.body);
+
+    // Also send the container to the rendering context
+    this._renderingContext = new RenderingContext({
+        generationContainer: this._generationContainer
+    });
     this._canvas = this._renderingContext.getCanvas();
     this._canvas.className += 'renderer';
     document.body.appendChild(this._canvas);
+
+    for(let i = 0; i < 9; i++) {
+        let box = new SelectionBox();
+        this._generationContainer.addBox(box);
+        box.setParent(this._generationContainer);
+    }
+
+    // Moved this here to get width
+    this._mainDialog = new MainDialog();
+    if (!this._renderingContext.hasComputeCapabilities()) {
+        this._mainDialog.disableMCC();
+    }
 
     window.addEventListener('resize', () => {
         const width = window.innerWidth;
         const height = window.innerHeight;
         this._renderingContext.resize(width, height);
+        // New, needs to always be the same size as canvas
+        this._generationContainer.resize(width, height, this._mainDialog._object._element);
     });
     CommonUtils.trigger('resize', window);
 
     document.body.addEventListener('dragover', e => e.preventDefault());
     document.body.addEventListener('drop', this._handleFileDrop);
-
-    this._mainDialog = new MainDialog();
-    if (!this._renderingContext.hasComputeCapabilities()) {
-        this._mainDialog.disableMCC();
-    }
 
     this._statusBar = new StatusBar();
     this._statusBar.appendTo(document.body);
