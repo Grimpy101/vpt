@@ -1,0 +1,11 @@
+/* #part /css/ui/GenerationContainer */
+
+.generation-container {
+    position: fixed;
+    left: 0;
+    top: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    column-gap: 50px;
+    row-gap: 50px;
+}

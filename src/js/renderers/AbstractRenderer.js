@@ -4,6 +4,7 @@
 // #link ../WebGL
 // #link ../SingleBuffer
 // #link ../DoubleBuffer
+// #link ../TFGeneratedTexture
 
 class AbstractRenderer {
 
@@ -102,8 +103,17 @@ setVolume(volume) {
 setTransferFunction(transferFunction) {
     const gl = this._gl;
     gl.bindTexture(gl.TEXTURE_2D, this._transferFunction);
-    gl.texImage2D(gl.TEXTURE_2D, 0,
-        gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, transferFunction);
+
+    // This can now accept either canvas or my generated texture
+    if (transferFunction instanceof  HTMLCanvasElement) {
+        gl.texImage2D(gl.TEXTURE_2D, 0,
+            gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, transferFunction);
+    } else if (transferFunction instanceof  TFGeneratedTexture) {
+        //console.log(transferFunction.texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0,
+            gl.RGBA, transferFunction.width, transferFunction.height,
+            0, gl.RGBA, gl.UNSIGNED_BYTE, transferFunction.texture)
+    }
     gl.bindTexture(gl.TEXTURE_2D, null);
 }
 
