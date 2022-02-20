@@ -83,8 +83,17 @@ constructor() {
 
     this._mainDialog.addEventListener('rendererchange', this._handleRendererChange);
     this._mainDialog.addEventListener('tonemapperchange', this._handleToneMapperChange);
+<<<<<<< HEAD
     this._handleRendererChange();
     this._handleToneMapperChange();
+=======
+    this._mainDialog.trigger('rendererchange', this._mainDialog.getSelectedRenderer());
+    this._mainDialog.trigger('tonemapperchange', this._mainDialog.getSelectedToneMapper());
+
+    this._generationContainer.addEventListener('change', () => {
+        this._renderingContext._renderer.reset();
+    });
+>>>>>>> eef8d1a (Add onclick volume reload)
 }
 
 _handleFileDrop(e) {

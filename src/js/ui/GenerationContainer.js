@@ -21,7 +21,7 @@ class GenerationContainer extends EventEmitter {
         for (let i = 0; i < this.boxes.length; i++) {
             if (this.boxes[i] != box) {
                 this.boxes[i].deselect();
-                this.boxes[i].updateTFTexture();
+                this.boxes[i].updateTFTexture(1);
             }
         }
         this.selectedBox = box;

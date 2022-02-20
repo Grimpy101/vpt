@@ -22,13 +22,15 @@ class TFGeneratedTexture {
             let r = Math.floor(Math.random() * 256);
             let g = Math.floor(Math.random() * 256);
             let b = Math.floor(Math.random() * 256);
-            let a = Math.floor(Math.random() * 256);
+            //let a = Math.floor(Math.random() * 256);
+            let a = 255;
 
             this.texture[index] = r;
             this.texture[index + 1] = g;
             this.texture[index + 2] = b;
             this.texture[index + 3] = a;
         }
+        console.log(this.texture);
     }
 
     resizeTexture(w, h) {
