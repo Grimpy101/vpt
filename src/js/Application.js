@@ -83,6 +83,10 @@ constructor() {
     this._mainDialog.addEventListener('tonemapperchange', this._handleToneMapperChange);
     this._mainDialog.trigger('rendererchange', this._mainDialog.getSelectedRenderer());
     this._mainDialog.trigger('tonemapperchange', this._mainDialog.getSelectedToneMapper());
+
+    this._generationContainer.addEventListener('change', () => {
+        this._renderingContext._renderer.reset();
+    });
 }
 
 _handleFileDrop(e) {
