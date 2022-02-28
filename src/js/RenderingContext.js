@@ -18,6 +18,7 @@ constructor(options) {
 
     // This was the simplest solution to render it like I wanted to
     this._generationContainer = options.generationContainer;
+    this._renderers = options.renderers;
 
     Object.assign(this, {
         _resolution : 512,
@@ -121,9 +122,11 @@ async setVolume(reader) {
     await this._volume.readMetadata();
     await this._volume.readModality('default');
     this._volume.setFilter(this._filter);
-    if (this._renderer) {
-        this._renderer.setVolume(this._volume);
-        this.startRendering();
+    for (let renderer of this._renderers) {
+        if (renderer) {
+            renderer.setVolume(this._volume);
+            this.startRendering();
+        }
     }
 }
 
@@ -138,22 +141,26 @@ setFilter(filter) {
     this._filter = filter;
     if (this._volume) {
         this._volume.setFilter(filter);
-        if (this._renderer) {
-            this._renderer.reset();
+        for (let renderer of this._renderers) {
+            if (renderer) {
+                renderer.reset();
+            }
         }
     }
 }
 
 chooseRenderer(renderer) {
-    if (this._renderer) {
-        this._renderer.destroy();
+    for (let i = 0; i < this._renderers.length; i++) {
+        if (renderer && this._renderers[i]) {
+            this._renderers[i].destroy();
+        }
+        const rendererClass = this._getRendererClass(renderer);
+        this._renderers[i] = new rendererClass(this._gl, this._volume, this._environmentTexture);
+        if (this._toneMapper) {
+            this._toneMapper.setTexture(this._renderers[i].getTexture());
+        }
+        this._isTransformationDirty = true;
     }
-    const rendererClass = this._getRendererClass(renderer);
-    this._renderer = new rendererClass(this._gl, this._volume, this._environmentTexture);
-    if (this._toneMapper) {
-        this._toneMapper.setTexture(this._renderer.getTexture());
-    }
-    this._isTransformationDirty = true;
 }
 
 chooseToneMapper(toneMapper) {
@@ -162,8 +169,8 @@ chooseToneMapper(toneMapper) {
     }
     const gl = this._gl;
     let texture;
-    if (this._renderer) {
-        texture = this._renderer.getTexture();
+    if (this._renderers[0]) {
+        texture = this._renderers[0].getTexture();
     } else {
         texture = WebGL.createTexture(gl, {
             width  : 1,
@@ -179,8 +186,8 @@ getCanvas() {
     return this._canvas;
 }
 
-getRenderer() {
-    return this._renderer;
+getRenderers() {
+    return this._renderers;
 }
 
 getToneMapper() {
@@ -209,18 +216,25 @@ _updateMvpInverseMatrix() {
     const viewMatrix = this._camera.viewMatrix;
     const projectionMatrix = this._camera.projectionMatrix;
 
-    if (this._renderer) {
-        this._renderer.modelMatrix.copy(modelMatrix);
-        this._renderer.viewMatrix.copy(viewMatrix);
-        this._renderer.projectionMatrix.copy(projectionMatrix);
-        this._renderer.reset();
+    for (let i = 0; i < this._renderers.length; i++) {
+        if (this._renderers[i]) {
+            this._renderers[i].modelMatrix.copy(modelMatrix);
+            this._renderers[i].viewMatrix.copy(viewMatrix);
+            this._renderers[i].projectionMatrix.copy(projectionMatrix);
+            this._renderers[i].reset();
+        }
     }
 }
 
 _render() {
     const gl = this._gl;
-    if (!gl || !this._renderer || !this._toneMapper) {
+    if (!gl || !this._toneMapper) {
         return;
+    }
+    for (let i = 0; i < this._renderers.length; i++) {
+        if (!this._renderers[i]) {
+            return;
+        }
     }
 
     this._updateMvpInverseMatrix();
@@ -235,9 +249,9 @@ _render() {
         let w = parseInt(bb.width);
         let h = parseInt(bb.height);
 
-        this._renderer.setTransferFunction(boxes[i].transferFunctionTexture);
+        this._renderers[i].setTransferFunction(boxes[i].transferFunctionTexture);
 
-        this._renderer.render();
+        this._renderers[i].render();
         this._toneMapper.render();
 
         gl.viewport(x, y, w, h);
@@ -257,6 +271,8 @@ _render() {
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
+
+    if (this._renderers[0] == this._renderers[1]) console.log("Šment, enaki so!");
 }
 
 getScale() {
@@ -282,13 +298,15 @@ getResolution() {
 }
 
 setResolution(resolution) {
-    if (this._renderer) {
-        this._renderer.setResolution(resolution);
-    }
-    if (this._toneMapper) {
-        this._toneMapper.setResolution(resolution);
-        if (this._renderer) {
-            this._toneMapper.setTexture(this._renderer.getTexture());
+    for (let i = 0; i < this._renderers.length; i++) {
+        if (this._renderers[i]) {
+            this._renderers[i].setResolution(resolution);
+        }
+        if (this._toneMapper) {
+            this._toneMapper.setResolution(resolution);
+            if (this._renderers[i]) {
+                this._toneMapper.setTexture(this._renderers[i].getTexture());
+            }
         }
     }
 }

@@ -22,7 +22,8 @@ constructor() {
 
     // Also send the container to the rendering context
     this._renderingContext = new RenderingContext({
-        generationContainer: this._generationContainer
+        generationContainer: this._generationContainer,
+        renderers: Array(9).fill(null)
     });
     this._canvas = this._renderingContext.getCanvas();
     this._canvas.className += 'renderer';
@@ -85,12 +86,19 @@ constructor() {
     this._mainDialog.addEventListener('tonemapperchange', this._handleToneMapperChange);
     this._handleRendererChange();
     this._handleToneMapperChange();
-    this._mainDialog.trigger('rendererchange', this._mainDialog.getSelectedRenderer());
-    this._mainDialog.trigger('tonemapperchange', this._mainDialog.getSelectedToneMapper());
 
     this._generationContainer.addEventListener('change', () => {
-        this._renderingContext._renderer.reset();
+        const renderers = this._renderingContext.getRenderers();
+        for (let i = 0; i < renderers.length; i++) {
+            renderers[i].reset();
+        }
     });
+
+    const renderers = this._renderingContext.getRenderers();
+    for (let i = 0; i < renderers.length; i++) {
+        console.log(renderers[i]);
+    }
+    if (renderers[0] === renderers[1]) console.log("Šment, enaki so!");
 }
 
 _handleFileDrop(e) {
@@ -120,10 +128,11 @@ _handleRendererChange() {
     }
     const which = this._mainDialog.getSelectedRenderer();
     this._renderingContext.chooseRenderer(which);
-    const renderer = this._renderingContext.getRenderer();
+    const renderers = this._renderingContext.getRenderers();
     const container = this._mainDialog.getRendererSettingsContainer();
     const dialogClass = this._getDialogForRenderer(which);
-    this._rendererDialog = new dialogClass(renderer);
+    // THIS IS BAD.
+    this._rendererDialog = new dialogClass(renderers[0]);
     this._rendererDialog.appendTo(container);
 }
 
@@ -172,7 +181,10 @@ _handleEnvmapLoad(e) {
     image.crossOrigin = 'anonymous';
     image.addEventListener('load', () => {
         this._renderingContext.setEnvironmentMap(image);
-        this._renderingContext.getRenderer().reset();
+        const renderers = this._renderingContext.getRenderers();
+        for (let i = 0; i < renderers.length; i++) {
+            renderers[i].reset();
+        }
     });
 
     if (options.type === 'file') {

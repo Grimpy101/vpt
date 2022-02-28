@@ -30,7 +30,7 @@ class TFGeneratedTexture {
             this.texture[index + 2] = b;
             this.texture[index + 3] = a;
         }
-        console.log(this.texture);
+        //console.log(this.texture);
     }
 
     resizeTexture(w, h) {

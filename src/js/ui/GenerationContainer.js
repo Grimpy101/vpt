@@ -1,9 +1,8 @@
 // #part /js/ui/GenerationContainer
 
 // #link /html/ui/GenerationContainer
-// #link /js/EventEmitter
 
-class GenerationContainer extends EventEmitter {
+class GenerationContainer extends EventTarget {
 
     constructor() {
         super();
@@ -27,7 +26,7 @@ class GenerationContainer extends EventEmitter {
         this.selectedBox = box;
         box.select();
 
-        this.trigger('change');
+        this.dispatchEvent(new Event('change'));
     }
 
     getSelected() {
