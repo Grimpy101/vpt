@@ -125,8 +125,10 @@ async setVolume(reader) {
     for (let renderer of this._renderers) {
         if (renderer) {
             renderer.setVolume(this._volume);
-            this.startRendering();
         }
+    }
+    if (this._renderers[0]) {
+        this.startRendering();
     }
 }
 
@@ -150,12 +152,14 @@ setFilter(filter) {
 }
 
 chooseRenderer(renderer) {
+    const boxes =  this.generationContainer.boxes;
     for (let i = 0; i < this._renderers.length; i++) {
         if (renderer && this._renderers[i]) {
             this._renderers[i].destroy();
         }
         const rendererClass = this._getRendererClass(renderer);
         this._renderers[i] = new rendererClass(this._gl, this._volume, this._environmentTexture);
+        //this._renderers[i].setTransferFunction(boxes[i].transferFunctionTexture);
         if (this._toneMapper) {
             this._toneMapper.setTexture(this._renderers[i].getTexture());
         }
@@ -249,9 +253,12 @@ _render() {
         let w = parseInt(bb.width);
         let h = parseInt(bb.height);
 
-        this._renderers[i].setTransferFunction(boxes[i].transferFunctionTexture);
+        //this._renderers[i].setTransferFunction(boxes[i].transferFunctionTexture);
 
         this._renderers[i].render();
+        if (this._toneMapper) {
+            this._toneMapper.setTexture(this._renderers[i].getTexture());
+        }
         this._toneMapper.render();
 
         gl.viewport(x, y, w, h);

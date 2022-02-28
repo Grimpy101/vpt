@@ -91,6 +91,7 @@ constructor() {
         const renderers = this._renderingContext.getRenderers();
         for (let i = 0; i < renderers.length; i++) {
             renderers[i].reset();
+            renderers[i].setTransferFunction(this._generationContainer.boxes[i].transferFunctionTexture)
         }
     });
 
