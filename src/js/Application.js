@@ -97,7 +97,7 @@ constructor() {
 
     const renderers = this._renderingContext.getRenderers();
     for (let i = 0; i < renderers.length; i++) {
-        console.log(renderers[i]);
+        //console.log(renderers[i]);
     }
     if (renderers[0] === renderers[1]) console.log("Šment, enaki so!");
 }

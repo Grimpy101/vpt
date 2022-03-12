@@ -10,6 +10,7 @@ class GenerationContainer extends EventTarget {
         this.html.classList.add("generation-container");
         this.boxes = [];
         this.selectedBox = null;
+        this.radius = 250;
     }
 
     appendTo(object) {
@@ -20,9 +21,11 @@ class GenerationContainer extends EventTarget {
         for (let i = 0; i < this.boxes.length; i++) {
             if (this.boxes[i] != box) {
                 this.boxes[i].deselect();
-                this.boxes[i].updateTFTexture(1);
+                this.boxes[i].updateTFTexture(box.transferFunctionTexture.texture, this.radius);
             }
         }
+        console.log(this.radius)
+        this.radius = Math.max(this.radius - 2, 0);
         this.selectedBox = box;
         box.select();
 

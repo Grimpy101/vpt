@@ -16,15 +16,15 @@ class SelectionBox {
             this.parent.updateSelected(this);
         })
 
-        this.transferFunctionTexture = new TFGeneratedTexture(5, 1);
+        this.transferFunctionTexture = new TFGeneratedTexture(50, 1);
     }
 
-    updateTFTexture(n) {
-        this.transferFunctionTexture.generateRandomTexture(
+    updateTFTexture(texture, r) {
+        /*this.transferFunctionTexture.generateRandomTexture(
             this.transferFunctionTexture.width,
-            this.transferFunctionTexture.height,
-            n
-        );
+            this.transferFunctionTexture.height
+        );*/
+        this.transferFunctionTexture.generateTextureInRadius(texture, r);
     }
 
     setParent(object) {
