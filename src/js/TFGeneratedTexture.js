@@ -30,7 +30,7 @@ class TFGeneratedTexture {
             this.texture[i + 2] = b;
             this.texture[i + 3] = a;
         }
-        console.log(this.texture);
+        //console.log(this.texture);
     }
 
     generateTextureInRadius(texture, r) {
@@ -72,8 +72,8 @@ class TFGeneratedTexture {
             }
             this.texture[i] = Math.min(Math.max(elem, 0), 255);
         }
-        console.log(this.texture);
-        console.log("--------");
+        //console.log(this.texture);
+        //console.log("--------");
     }
 
     resizeTexture(w, h) {

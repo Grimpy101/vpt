@@ -25,7 +25,7 @@ class GenerationContainer extends EventTarget {
             }
         }
         console.log(this.radius)
-        this.radius = Math.max(this.radius - 2, 0);
+        this.radius = Math.max(this.radius - 10, 0);
         this.selectedBox = box;
         box.select();
 
