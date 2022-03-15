@@ -18,7 +18,11 @@ class TFGeneratedTexture {
             let r = Math.floor(Math.random() * 256);
             let g = Math.floor(Math.random() * 256);
             let b = Math.floor(Math.random() * 256);
-            let a = Math.floor(Math.random() * 256);
+            let a = 0;
+            let aRand = Math.random();
+            if (aRand >= 0.5) {
+                a = 255;
+            }
             //let a = 255;
 
             this.texture[i] = r;
