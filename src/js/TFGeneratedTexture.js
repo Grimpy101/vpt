@@ -23,7 +23,8 @@ class TFGeneratedTexture {
             if (aRand >= 0.5) {
                 a = 255;
             }
-            //let a = 255;
+            // Bad hack
+            //a = Math.min(Math.max(Math.log(i+1)*200, 0), 255);
 
             this.texture[i] = r;
             this.texture[i + 1] = g;

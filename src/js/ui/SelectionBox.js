@@ -16,6 +16,7 @@ class SelectionBox {
             this.parent.updateSelected(this);
         })
 
+        // The size of TF is given here
         this.transferFunctionTexture = new TFGeneratedTexture(50, 1);
     }
 
