@@ -95,6 +95,8 @@ constructor() {
         }
     });
     TFGeneratedTexture.hsv2rgb(196, 0.88, 0.99);
+    for (let i = 0; i <= 1; i += 0.1)
+        console.log(TFGeneratedTexture.betaDistribution(i, 3, 3));
 }
 
 _handleFileDrop(e) {
