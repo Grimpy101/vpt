@@ -94,6 +94,7 @@ constructor() {
             renderers[i].setTransferFunction(this._generationContainer.boxes[i].transferFunctionTexture)
         }
     });
+    TFGeneratedTexture.hsv2rgb(196, 0.88, 0.99);
 }
 
 _handleFileDrop(e) {

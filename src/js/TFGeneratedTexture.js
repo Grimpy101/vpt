@@ -23,15 +23,12 @@ class TFGeneratedTexture {
             if (aRand >= 0.5) {
                 a = 255;
             }
-            // Bad hack
-            //a = Math.min(Math.max(Math.log(i+1)*200, 0), 255);
 
             this.texture[i] = r;
             this.texture[i + 1] = g;
             this.texture[i + 2] = b;
             this.texture[i + 3] = a;
         }
-        //console.log(this.texture);
     }
 
     generateTextureInRadius(texture, r) {
@@ -59,11 +56,7 @@ class TFGeneratedTexture {
 
         for (let i = 0; i < sphereVector.length; i++) {
             sphereVector[i] = sphereVector[i] / norm;
-            //console.log(sphereVector[i]);
         }
-
-        console.log(texture);
-        //console.log(sphereVector);
 
         for (let i = 0; i < this.texture.length; i++) {
             let elem = Math.round((sphereVector[i] * r) + texture[i]);
@@ -73,8 +66,51 @@ class TFGeneratedTexture {
             }
             this.texture[i] = Math.min(Math.max(elem, 0), 255);
         }
-        //console.log(this.texture);
-        //console.log("--------");
+    }
+
+    // Using degrees, not radians for h!
+    // s and v contain interval [0, 1]
+    static hsv2rgb(h, s, v) {
+        let C = v * s;
+        let H1 = h / 60;
+        let X = C * (1 - Math.abs((H1 % 2) - 1));
+        console.log(C, X, H1);
+
+        let R = 0;
+        let G = 0;
+        let B = 0;
+        if (0 <= H1 && H1 < 1) {
+            R = C;
+            G = X;
+            B = 0;
+        } else if (1 <= H1 && H1 < 2) {
+            R = X;
+            G = C;
+            B = 0;
+        } else if (2 <= H1 && H1 < 3) {
+            R = 0;
+            C = G;
+            B = X;
+        } else if (3 <= H1 && H1 < 4) {
+            R = 0;
+            G = X;
+            B = C;
+        } else if (4 <= H1 && H1 < 5) {
+            R = X;
+            G = 0;
+            B = C;
+        } else if (5 <= H1 && H1 < 6) {
+            R = C;
+            G = 0;
+            B = X;
+        }
+
+        let m = v - C;
+        R = (R + m) * 255;
+        G = (G + m) * 255;
+        B = (B + m) * 255;
+
+        return (R, G, B);
     }
 
     resizeTexture(w, h) {
