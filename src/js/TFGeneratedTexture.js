@@ -190,23 +190,27 @@ class TFGeneratedTexture {
         return x1;
     }
 
-    // This is not a full implementation!!!
-    // Only works for positive integers!
-    static gammaFun(n) {
-        let result = 1;
-        for (let i = 1; i < n; i++) {
-            result *= i;
-        }
-        return result
+    static exponentialDistribution(lambda) {
+        let rand = Math.random();
+        while (rand == 0) rand = Math.random();
+        return -(Math.log(1 - rand))/lambda;
     }
 
-    static betaDistribution(x, alpha, beta) {
-        // Only positive integers allowed for alpha and beta!!!
-        let B = (TFGeneratedTexture.gammaFun(alpha) * TFGeneratedTexture.gammaFun(beta))
-            / TFGeneratedTexture.gammaFun(alpha + beta);
-        let f1 = Math.pow(x, alpha - 1);
-        let f2 = Math.pow((1 - x), beta - 1);
-        //console.log(f1, f2, B);
-        return ((f1 * f2) / B);
+    static gammaDistribution(k, phi) {
+        let n = Math.floor(k);
+        
+        let dist1 = 0;
+        for (let i = 1; i <= n; i++) {
+            dist1 += TFGeneratedTexture.exponentialDistribution(1);
+        }
+
+        return phi * dist1;
+    }
+
+    static betaDistribution(alpha, beta) {
+        let phi = 1;
+        let X = TFGeneratedTexture.gammaDistribution(alpha, phi);
+        let Y = TFGeneratedTexture.gammaDistribution(beta, phi);
+        return X / (X + Y);
     }
 }
