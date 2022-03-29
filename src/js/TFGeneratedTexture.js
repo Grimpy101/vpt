@@ -37,7 +37,43 @@ class TFGeneratedTexture {
             this.texture[i+1] = rgb[1];
             this.texture[i+2] = rgb[2];
             // Maybe multimodal distribution instead?
+            // OR interpolate between randomly selected few values in the texture?
             this.texture[i+3] = perlin2 * 255;
+        }
+
+        this.someAlphaChannelMagic1();
+    }
+
+    // Does this even make sense?
+    someAlphaChannelMagic1() {
+        let len = this.width * this.height;
+        let startValue = 0;
+        const indices = [];
+
+        let flipSwitch = Math.round(Math.random());
+        startValue = flipSwitch * 255;
+        for (let i = 0; i < len; i++) {
+            if (TFGeneratedTexture.betaDistribution(this.alpha, this.beta) <= 0.5) {
+                indices.push(i);
+                this.texture[i] = flipSwitch * 255;
+                flipSwitch = (flipSwitch + 1) % 2;
+            }
+        }
+
+        let indexCounter = -1;
+        for (let i = 0; i < len; i++) {
+            let start = 0;
+            let end = len;
+            if (indexCounter >= 0) start = indices[indexCounter];
+            if (indexCounter + 1 < indices.length) end = indices[indexCounter + 1];
+
+            if (end - start != 0) {
+                this.texture[i * 4 + 3] = this.texture[start] + (i - start)/(end - start) * (this.texture[end] - this.texture[start]);
+            } else {
+                this.texture[i * 4 + 3] = this.texture[end];
+            }
+
+            if (indexCounter == end) indexCounter++;
         }
     }
 
