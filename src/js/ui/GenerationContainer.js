@@ -22,7 +22,11 @@ class GenerationContainer extends EventTarget {
         for (let i = 0; i < this.boxes.length; i++) {
             if (this.boxes[i] != box) {
                 this.boxes[i].deselect();
-                this.boxes[i].updateTFTexture(box.transferFunctionTexture.texture, this.radius);
+                if (i > this.boxes.length / 2) {
+                    this.boxes[i].updateTFTextureByRadius(box.transferFunctionTexture.texture, this.radius);
+                } else {
+                    this.boxes[i].updateTFTexture();
+                }
             }
         }
         console.log(this.radius)
@@ -31,6 +35,12 @@ class GenerationContainer extends EventTarget {
         box.select();
 
         this.dispatchEvent(new Event('change'));
+    }
+
+    setAllNoiseSizes(num) {
+        for (let i = 0; i < this.boxes.length; i++) {
+            this.boxes[i].transferFunctionTexture.size = num;
+        }
     }
 
     getSelected() {

@@ -8,7 +8,7 @@ class TFGeneratedTexture {
         this.height = h;
         this.texture = new Uint8Array(w * h * 4);
 
-        this.size = 5;
+        this.size = 0.05;
         this.alpha = 5;
         this.beta = 2;
 
@@ -24,8 +24,9 @@ class TFGeneratedTexture {
         let dispY = Math.random() * 255;
 
         for (let i = 0; i < this.texture.length; i+=4) {
-            let perlin = (PerlinNoiseGenerator.perlinNoise((i / 4) * 0.1 + dispX, dispY) + 1) * 0.5;
-            let hue = perlin * 360;
+            let perlin1 = (PerlinNoiseGenerator.perlinNoise((i / 4) * this.size + dispX, dispY) + 1) * 0.5;
+            let perlin2 = (PerlinNoiseGenerator.perlinNoise((i / 4) * this.size + dispY, dispX) + 1) * 0.5 * 0.8;
+            let hue = perlin1 * 360;
             let saturation = TFGeneratedTexture.betaDistribution(this.alpha, this.beta);
             let value = TFGeneratedTexture.betaDistribution(this.alpha, this.beta);
             //console.log(hue, saturation, value);
@@ -35,9 +36,9 @@ class TFGeneratedTexture {
             this.texture[i] = rgb[0];
             this.texture[i+1] = rgb[1];
             this.texture[i+2] = rgb[2];
-            this.texture[i+3] = perlin * 255;
+            // Maybe multimodal distribution instead?
+            this.texture[i+3] = perlin2 * 255;
         }
-        //console.log(this.texture);
     }
 
     generateTextureInRadius(texture, r) {

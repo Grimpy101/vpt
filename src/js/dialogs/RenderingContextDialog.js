@@ -12,8 +12,10 @@ constructor(options) {
     this._handleResolutionChange = this._handleResolutionChange.bind(this);
     this._handleTransformationChange = this._handleTransformationChange.bind(this);
     this._handleFilterChange = this._handleFilterChange.bind(this);
+    this._handleNoiseSizeChange = this._handleNoiseSizeChange.bind(this);
 
     this._binds.resolution.addEventListener('change', this._handleResolutionChange);
+    this._binds.noise_size.addEventListener('change', this._handleNoiseSizeChange);
     this._binds.scale.addEventListener('input', this._handleTransformationChange);
     this._binds.translation.addEventListener('input', this._handleTransformationChange);
     this._binds.filter.addEventListener('change', this._handleFilterChange);
@@ -21,6 +23,10 @@ constructor(options) {
 
 get resolution() {
     return this._binds.resolution.getValue();
+}
+
+get noiseSize() {
+    return this._binds.noise_size.getValue();
 }
 
 get scale() {
@@ -45,6 +51,10 @@ _handleTransformationChange() {
 
 _handleFilterChange() {
     this.dispatchEvent(new Event('filter'));
+}
+
+_handleNoiseSizeChange() {
+    this.dispatchEvent(new Event('noiseSize'));
 }
 
 }

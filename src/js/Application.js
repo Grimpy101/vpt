@@ -81,6 +81,10 @@ constructor() {
         const filter = this._renderingContextDialog.filter;
         this._renderingContext.setFilter(filter);
     });
+    this._renderingContextDialog.addEventListener('noiseSize', e => {
+        let num = this._renderingContextDialog.noiseSize;
+        this._generationContainer.setAllNoiseSizes(num);
+    });
 
     this._mainDialog.addEventListener('rendererchange', this._handleRendererChange);
     this._mainDialog.addEventListener('tonemapperchange', this._handleToneMapperChange);

@@ -20,12 +20,16 @@ class SelectionBox {
         this.transferFunctionTexture = new TFGeneratedTexture(50, 1);
     }
 
-    updateTFTexture(texture, r) {
+    updateTFTextureByRadius(texture, r) {
         /*this.transferFunctionTexture.generateRandomTexture(
             this.transferFunctionTexture.width,
             this.transferFunctionTexture.height
         );*/
         this.transferFunctionTexture.generateTextureInRadius(texture, r);
+    }
+
+    updateTFTexture() {
+        this.transferFunctionTexture.generateRandomTexture(this.transferFunctionTexture.width, this.transferFunctionTexture.height);
     }
 
     setParent(object) {
