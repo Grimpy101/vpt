@@ -98,6 +98,28 @@ constructor() {
             renderers[i].setTransferFunction(this._generationContainer.boxes[i].transferFunctionTexture)
         }
     });
+
+    this._mouseX = 0;
+    this._mouseY = 0;
+    this._inFullScreen = false;
+
+    window.addEventListener('mousemove', (e) => {
+        this._mouseX = e.pageX;
+        this._mouseY = e.pageY;
+    });
+
+    window.addEventListener('keydown', (e) => {
+        if (e.code == 'KeyF') {
+            if (!this._inFullScreen) {
+                this._generationContainer.fullScreen(this._mouseX, this._mouseY);
+            } else {
+                window.dispatchEvent(new Event('change'));
+                this._generationContainer.revertFullScreen();
+            }
+
+            this._inFullScreen = !this._inFullScreen;
+        }
+    });
 }
 
 _handleFileDrop(e) {

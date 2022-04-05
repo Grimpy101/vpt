@@ -61,4 +61,47 @@ class GenerationContainer extends EventTarget {
         this.html.style.height = height + "px";
         this.html.style.left = dWidth + "px";
     }
+
+    fullScreen(mouseX, mouseY) {
+        let focusedBox = null;
+        for (let box of this.boxes) {
+            const domRect = box.html.getBoundingClientRect();
+            let leftX = domRect.x;
+            let topY = domRect.y;
+            let rightX = leftX + domRect.width;
+            let bottomY = topY + domRect.height;
+
+            if (leftX <= mouseX && rightX >= mouseX) {
+                if (topY <= mouseY && bottomY >= mouseY) {
+                    focusedBox = box;
+                    break;
+                }
+            }
+        }
+
+        if (focusedBox) {
+            for (let box of this.boxes) {
+                box.html.classList.remove("selection-box");
+                if (box != focusedBox) {
+                    box.html.classList.add("selection-box-minimized");
+                } else {
+                    box.html.classList.add("selection-box-fullscreen");
+                }
+            }
+
+            this.html.classList.remove("generation-container");
+            this.html.classList.add("generation-container-fullscreen");
+        }
+    }
+
+    revertFullScreen() {
+        for (let box of this.boxes) {
+            box.html.classList.remove("selection-box-minimized");
+            box.html.classList.remove("selection-box-fullscreen");
+            box.html.classList.add("selection-box");
+        }
+
+        this.html.classList.remove("generation-container-fullscreen");
+        this.html.classList.add("generation-container");
+    }
 }

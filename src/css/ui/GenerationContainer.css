@@ -9,3 +9,10 @@
     column-gap: 10px;
     row-gap: 10px;
 }
+
+.generation-container-fullscreen {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: -1;
+}

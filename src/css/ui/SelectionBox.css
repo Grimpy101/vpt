@@ -23,3 +23,25 @@
     top: 210px;
     position: relative;
 }
+
+.selection-box-minimized {
+    display: none;
+    width: 0%;
+    height: 0%;
+    justify-self: center;
+    align-self: start;
+    box-sizing: content-box;
+}
+
+.selection-box-fullscreen {
+    width: 100%;
+    height: 100%;
+    justify-self: center;
+    align-self: start;
+    box-sizing: content-box;
+    border: 0 !important;
+}
+
+.selection-box-fullscreen > canvas {
+    display: none;
+}
