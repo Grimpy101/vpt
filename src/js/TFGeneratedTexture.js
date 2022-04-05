@@ -114,6 +114,18 @@ class TFGeneratedTexture {
         }
     }
 
+    updateCanvas(canvas) {
+        canvas.width = this.width;
+        canvas.height = this.height;
+        const context = canvas.getContext("2d");
+        const imgData = context.createImageData(this.width, this.height);
+        const data = imgData.data;
+        for (let i = 0; i < data.length; i++) {
+            data[i] = this.texture[i];
+        }
+        context.putImageData(imgData, 0, 0);
+    }
+
     // Using degrees, not radians for h!
     // s and v contain interval [0, 1]
     static hsv2rgb(h, s, v) {

@@ -11,6 +11,9 @@ class SelectionBox {
         this.html = document.createElement("div");
         this.html.classList.add("selection-box");
         this.html.classList.add("selection-box-deselected");
+        
+        this.tfCanvas = document.createElement("canvas");
+        this.html.appendChild(this.tfCanvas)
 
         this.html.addEventListener('click', () => {
             this.parent.updateSelected(this);
@@ -26,10 +29,12 @@ class SelectionBox {
             this.transferFunctionTexture.height
         );*/
         this.transferFunctionTexture.generateTextureInRadius(texture, r);
+        this.transferFunctionTexture.updateCanvas(this.tfCanvas);
     }
 
     updateTFTexture() {
         this.transferFunctionTexture.generateRandomTexture(this.transferFunctionTexture.width, this.transferFunctionTexture.height);
+        this.transferFunctionTexture.updateCanvas(this.tfCanvas);
     }
 
     setParent(object) {
