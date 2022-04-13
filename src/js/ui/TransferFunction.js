@@ -1,17 +1,24 @@
-// #part /js/TransferFunctionWidget
+import { UIObject } from './UIObject.js';
 
-// #link utils
-// #link WebGL
-// #link Draggable
+import { DOMUtils } from '../utils/DOMUtils.js';
+import { CommonUtils } from '../utils/CommonUtils.js';
+import { WebGL } from '../WebGL.js';
+import { Draggable } from '../Draggable.js';
 
-// #link /html/TransferFunctionWidget
-// #link /html/TransferFunctionWidgetBumpHandle
-// #link /css/TransferFunctionWidget
+const [ SHADERS, MIXINS ] = await Promise.all([
+    'shaders.json',
+    'mixins.json',
+].map(url => fetch(url).then(response => response.json())));
 
-class TransferFunctionWidget extends EventTarget {
+const [ template, templateBump ] = await Promise.all([
+    './html/ui/TransferFunction.html',
+    './html/ui/TransferFunctionBump.html',
+].map(url => fetch(url).then(response => response.text())));
+
+export class TransferFunction extends UIObject {
 
 constructor(options) {
-    super();
+    super(template, options);
 
     this._onColorChange = this._onColorChange.bind(this);
 
@@ -22,9 +29,6 @@ constructor(options) {
         _transferFunctionHeight : 256,
         scaleSpeed              : 0.003
     }, options);
-
-    this._element = DOMUtils.instantiate(TEMPLATES.TransferFunctionWidget);
-    this._binds = DOMUtils.bind(this._element);
 
     this._canvas = this._element.querySelector('canvas');
     this._canvas.width = this._transferFunctionWidth;
@@ -44,8 +48,8 @@ constructor(options) {
 
     this._clipQuad = WebGL.createClipQuad(gl);
     this._program = WebGL.buildPrograms(gl, {
-        drawTransferFunction: SHADERS.drawTransferFunction
-    }, MIXINS).drawTransferFunction;
+        TransferFunction: SHADERS.TransferFunction
+    }, MIXINS).TransferFunction;
     const program = this._program;
     gl.useProgram(program.program);
     gl.bindBuffer(gl.ARRAY_BUFFER, this._clipQuad);
@@ -71,7 +75,7 @@ constructor(options) {
             this._bumps = JSON.parse(data);
             this.render();
             this._rebuildHandles();
-            this.dispatchEvent(new Event('change'));
+            this.trigger('change');
         });
     });
 
@@ -116,6 +120,10 @@ render() {
     }
 }
 
+getValue() {
+    return this._canvas;
+}
+
 addBump(options) {
     const bumpIndex = this._bumps.length;
     const newBump = {
@@ -138,7 +146,7 @@ addBump(options) {
     this._addHandle(bumpIndex);
     this.selectBump(bumpIndex);
     this.render();
-    this.dispatchEvent(new Event('change'));
+    this.trigger('change');
 }
 
 removeSelectedBump() {
@@ -149,7 +157,7 @@ removeAllBumps() {
     this._bumps = [];
     this._rebuildHandles();
     this.render();
-    this.dispatchEvent(new Event('change'));
+    this.trigger('change');
 }
 
 _removeHandle(index) {
@@ -162,11 +170,11 @@ _removeHandle(index) {
     }
     this._rebuildHandles();
     this.render();
-    this.dispatchEvent(new Event('change'));
+    this.trigger('change');
 }
 
 _addHandle(index) {
-    const handle = DOMUtils.instantiate(TEMPLATES.TransferFunctionWidgetBump);
+    const handle = DOMUtils.instantiate(templateBump);
     this._element.querySelector('.widget').appendChild(handle);
     handle.dataset.index = index;
 
@@ -183,13 +191,13 @@ _addHandle(index) {
         this._bumps[i].position.x = x;
         this._bumps[i].position.y = y;
         this.render();
-        this.dispatchEvent(new Event('change'));
+        this.trigger('change');
     });
-    handle.addEventListener('mousedown', e => {
+    handle.addEventListener('pointerdown', e => {
         const i = parseInt(e.currentTarget.dataset.index);
         this.selectBump(i);
     });
-    handle.addEventListener('mousewheel', e => {
+    handle.addEventListener('wheel', e => {
         const amount = e.deltaY * this.scaleSpeed;
         const scale = Math.exp(-amount);
         const i = parseInt(e.currentTarget.dataset.index);
@@ -200,7 +208,7 @@ _addHandle(index) {
             this._bumps[i].size.x *= scale;
         }
         this.render();
-        this.dispatchEvent(new Event('change'));
+        this.trigger('change');
     });
 }
 
@@ -226,7 +234,7 @@ selectBump(index) {
     }
 
     const color = this._bumps[index].color;
-    this._binds.color.value = CommonUtils.rgb2hex(color.r, color.g, color.b);
+    this._binds.color.value = CommonUtils.rgb2hex([color.r, color.g, color.b]);
     this._binds.alpha.value = color.a;
 }
 
@@ -248,12 +256,12 @@ _onColorChange() {
     const index = parseInt(selectedBump.dataset.index);
     const color = CommonUtils.hex2rgb(this._binds.color.value);
     const alpha = parseFloat(this._binds.alpha.value);
-    this._bumps[index].color.r = color.r;
-    this._bumps[index].color.g = color.g;
-    this._bumps[index].color.b = color.b;
+    this._bumps[index].color.r = color[0];
+    this._bumps[index].color.g = color[1];
+    this._bumps[index].color.b = color[2];
     this._bumps[index].color.a = alpha;
     this.render();
-    this.dispatchEvent(new Event('change'));
+    this.trigger('change');
 }
 
 appendTo(object) {

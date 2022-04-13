@@ -1,8 +1,6 @@
-// #part /js/TFGeneratedTexture
+import { PerlinNoiseGenerator } from './PerlinNoiseGenerator.js';
 
-// #link PerlinNoiseGenerator
-
-class TFGeneratedTexture {
+export class TFGeneratedTexture {
     constructor(w, h) {
         this.width = w;
         this.height = h;

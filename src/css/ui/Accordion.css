@@ -1,5 +1,3 @@
-/* #part /css/ui/Accordion */
-
 .accordion {
     --handle-height   : 18px;
     --icon-size       : 10px;
@@ -21,7 +19,7 @@
     line-height: var(--handle-height);
 
     background-color: var(--handle-color);
-    background-image: url(../images/icons/down-arrow.svg);
+    background-image: url(../../images/icons/down-arrow.svg);
     background-position: 5px 50%;
     background-repeat: no-repeat;
     background-size: var(--icon-size);
@@ -46,7 +44,7 @@
 }
 
 .accordion.contracted > .handle {
-    background-image: url(../images/icons/arrow-angle-pointing-to-right.svg);
+    background-image: url(../../images/icons/arrow-angle-pointing-to-right.svg);
     color: var(--text-color);
 }
 

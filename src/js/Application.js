@@ -1,13 +1,19 @@
-// #part /js/Application
+import { DOMUtils } from './utils/DOMUtils.js';
 
-// #link utils
-// #link readers
-// #link loaders
-// #link dialogs
-// #link ui
-// #link RenderingContext
+import { UI } from './ui/UI.js';
+import { StatusBar } from './ui/StatusBar.js';
 
-class Application {
+import { LoaderFactory } from './loaders/LoaderFactory.js';
+import { ReaderFactory } from './readers/ReaderFactory.js';
+
+import { MainDialog } from './dialogs/MainDialog.js';
+import { VolumeLoadDialog } from './dialogs/VolumeLoadDialog.js';
+import { EnvmapLoadDialog } from './dialogs/EnvmapLoadDialog.js';
+
+import { RenderingContext } from './RenderingContext.js';
+import { RenderingContextDialog } from './dialogs/RenderingContextDialog.js';
+
+export class Application {
 
 constructor() {
     this._handleFileDrop = this._handleFileDrop.bind(this);
@@ -15,6 +21,8 @@ constructor() {
     this._handleToneMapperChange = this._handleToneMapperChange.bind(this);
     this._handleVolumeLoad = this._handleVolumeLoad.bind(this);
     this._handleEnvmapLoad = this._handleEnvmapLoad.bind(this);
+
+    this._binds = DOMUtils.bind(document.body);
 
     // This is new, boxes to mark generated selection containers
     this._generationContainer = new GenerationContainer();
@@ -25,9 +33,7 @@ constructor() {
         generationContainer: this._generationContainer,
         renderers: Array(9).fill(null)
     });
-    this._canvas = this._renderingContext.getCanvas();
-    this._canvas.className += 'renderer';
-    document.body.appendChild(this._canvas);
+    this._binds.container.appendChild(this._renderingContext.getCanvas());
 
     for(let i = 0; i < 9; i++) {
         let box = new SelectionBox();
@@ -52,6 +58,8 @@ constructor() {
 
     document.body.addEventListener('dragover', e => e.preventDefault());
     document.body.addEventListener('drop', this._handleFileDrop);
+
+    this._mainDialog = new MainDialog();
 
     this._statusBar = new StatusBar();
     this._statusBar.appendTo(document.body);
@@ -84,6 +92,10 @@ constructor() {
     this._renderingContextDialog.addEventListener('noiseSize', e => {
         let num = this._renderingContextDialog.noiseSize;
         this._generationContainer.setAllNoiseSizes(num);
+    });
+
+    this._renderingContext.addEventListener('progress', e => {
+        this._volumeLoadDialog._binds.loadProgress.setProgress(e.detail * 100);
     });
 
     this._mainDialog.addEventListener('rendererchange', this._handleRendererChange);
@@ -143,6 +155,29 @@ _handleFileDrop(e) {
     }));
 }
 
+_constructDialogFromProperties(object) {
+    const panel = {
+        type: 'panel',
+        children: [],
+    };
+    for (const property of object.properties) {
+        if (property.type === 'transfer-function') {
+            panel.children.push({
+                type: 'accordion',
+                label: property.label,
+                children: [{ ...property, bind: property.name }]
+            });
+        } else {
+            panel.children.push({
+                type: 'field',
+                label: property.label,
+                children: [{ ...property, bind: property.name }]
+            });
+        }
+    }
+    return UI.create(panel);
+}
+
 _handleRendererChange() {
     if (this._rendererDialog) {
         this._rendererDialog.destroy();
@@ -150,10 +185,20 @@ _handleRendererChange() {
     const which = this._mainDialog.getSelectedRenderer();
     this._renderingContext.chooseRenderer(which);
     const renderers = this._renderingContext.getRenderers();
-    const container = this._mainDialog.getRendererSettingsContainer();
-    const dialogClass = this._getDialogForRenderer(which);
-    // THIS IS BAD.
-    this._rendererDialog = new dialogClass(renderers[0]);
+    const { object, binds } = this._constructDialogFromProperties(renderer);
+    this._rendererDialog = object;
+    for (const renderer of renderers) {
+        for (const name in binds) {
+            binds[name].addEventListener('change', e => {
+                const value = binds[name].getValue();
+                renderer[name] = value;
+                renderer.dispatchEvent(new CustomEvent('change', {
+                    detail: { name, value }
+                }));
+            });
+        }
+    }
+    const container = this._mainDialog.getRendererSettingsContainer()._element;
     this._rendererDialog.appendTo(container);
 }
 
@@ -164,31 +209,42 @@ _handleToneMapperChange() {
     const which = this._mainDialog.getSelectedToneMapper();
     this._renderingContext.chooseToneMapper(which);
     const toneMapper = this._renderingContext.getToneMapper();
-    const container = this._mainDialog.getToneMapperSettingsContainer();
-    const dialogClass = this._getDialogForToneMapper(which);
-    this._toneMapperDialog = new dialogClass(toneMapper);
+    const { object, binds } = this._constructDialogFromProperties(toneMapper);
+    this._toneMapperDialog = object;
+    for (const name in binds) {
+        binds[name].addEventListener('change', e => {
+            const value = binds[name].getValue();
+            toneMapper[name] = value;
+            toneMapper.dispatchEvent(new CustomEvent('change', {
+                detail: { name, value }
+            }));
+        });
+    }
+    const container = this._mainDialog.getToneMapperSettingsContainer()._element;
     this._toneMapperDialog.appendTo(container);
 }
 
 _handleVolumeLoad(e) {
     const options = e.detail;
     if (options.type === 'file') {
-        const readerClass = this._getReaderForFileType(options.filetype);
+        const readerClass = ReaderFactory(options.filetype);
         if (readerClass) {
-            const loader = new BlobLoader(options.file);
+            const loaderClass = LoaderFactory('blob');
+            const loader = new loaderClass(options.file);
             const reader = new readerClass(loader, {
                 width  : options.dimensions.x,
                 height : options.dimensions.y,
                 depth  : options.dimensions.z,
-                bits   : options.precision
+                bits   : options.precision,
             });
             this._renderingContext.stopRendering();
             this._renderingContext.setVolume(reader);
         }
     } else if (options.type === 'url') {
-        const readerClass = this._getReaderForFileType(options.filetype);
+        const readerClass = ReaderFactory(options.filetype);
         if (readerClass) {
-            const loader = new AjaxLoader(options.url);
+            const loaderClass = LoaderFactory('ajax');
+            const loader = new loaderClass(options.url);
             const reader = new readerClass(loader);
             this._renderingContext.stopRendering();
             this._renderingContext.setVolume(reader);
@@ -216,41 +272,6 @@ _handleEnvmapLoad(e) {
         reader.readAsDataURL(options.file);
     } else if (options.type === 'url') {
         image.src = options.url;
-    }
-}
-
-_getReaderForFileType(type) {
-    switch (type) {
-        case 'bvp'  : return BVPReader;
-        case 'raw'  : return RAWReader;
-        case 'zip'  : return ZIPReader;
-    }
-}
-
-_getDialogForRenderer(renderer) {
-    switch (renderer) {
-        case 'mip' : return MIPRendererDialog;
-        case 'iso' : return ISORendererDialog;
-        case 'eam' : return EAMRendererDialog;
-        case 'mcs' : return MCSRendererDialog;
-        case 'mcm' : return MCMRendererDialog;
-        case 'mcc' : return MCMRendererDialog; // yes, the same
-        case 'dos' : return DOSRendererDialog;
-    }
-}
-
-_getDialogForToneMapper(toneMapper) {
-    switch (toneMapper) {
-        case 'artistic'   : return ArtisticToneMapperDialog;
-        case 'range'      : return RangeToneMapperDialog;
-        case 'reinhard'   : return ReinhardToneMapperDialog;
-        case 'reinhard2'  : return Reinhard2ToneMapperDialog;
-        case 'uncharted2' : return Uncharted2ToneMapperDialog;
-        case 'filmic'     : return FilmicToneMapperDialog;
-        case 'unreal'     : return UnrealToneMapperDialog;
-        case 'aces'       : return AcesToneMapperDialog;
-        case 'lottes'     : return LottesToneMapperDialog;
-        case 'uchimura'   : return UchimuraToneMapperDialog;
     }
 }
 

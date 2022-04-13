@@ -1,6 +1,4 @@
-// #part /js/PerlinNoiseGenerator
-
-class PerlinNoiseGenerator {
+export class PerlinNoiseGenerator {
     // Based on https://rtouti.github.io/graphics/perlin-noise-algorithm
 
     // Original Ken Perlin permutation

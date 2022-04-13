@@ -1,12 +1,13 @@
-// #part /js/ui/VectorSpinner
+import { UIObject } from './UIObject.js';
+import { Spinner } from './Spinner.js';
 
-// #link UIObject
-// #link Spinner
+const response = await fetch('./html/ui/VectorSpinner.html');
+const template = await response.text();
 
-class VectorSpinner extends UIObject {
+export class VectorSpinner extends UIObject {
 
 constructor(options) {
-    super(TEMPLATES.ui.VectorSpinner, options);
+    super(template, options);
 
     Object.assign(this, {
         value : 0,
@@ -25,9 +26,9 @@ constructor(options) {
         step  : this.step
     };
 
-    this._spinnerX = new Spinner(opts);
-    this._spinnerY = new Spinner(opts);
-    this._spinnerZ = new Spinner(opts);
+    this._spinnerX = new Spinner({ ...opts, value: this.value.x });
+    this._spinnerY = new Spinner({ ...opts, value: this.value.y });
+    this._spinnerZ = new Spinner({ ...opts, value: this.value.z });
 
     this._spinnerX.appendTo(this._binds.vectorX);
     this._spinnerY.appendTo(this._binds.vectorY);

@@ -1,5 +1,3 @@
-/* #part /css/ui/Sidebar */
-
 .sidebar {
     --sidebar-width    : 300px;
     --handle-width     : 10px;
@@ -29,7 +27,7 @@
     flex: 0 0 var(--handle-width);
     background-color: var(--handle-color);
 
-    background-image: url(../images/icons/left-arrow-angle-big-gross-symbol.svg);
+    background-image: url(../../images/icons/left-arrow-angle-big-gross-symbol.svg);
     background-position: 50% 10px;
     background-repeat: no-repeat;
     background-size: var(--icon-size);
@@ -44,7 +42,7 @@
 }
 
 .sidebar.contracted > .handle {
-    background-image: url(../images/icons/arrow-angle-pointing-to-right.svg);
+    background-image: url(../../images/icons/arrow-angle-pointing-to-right.svg);
 }
 
 .sidebar > .container {

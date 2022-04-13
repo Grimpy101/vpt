@@ -1,5 +1,3 @@
-// #part /uispecs/MainDialog
-
 {
   "type": "sidebar",
   "bind": "sidebar",
@@ -35,7 +33,7 @@
                   "children": [
                     {
                       "type": "field",
-                      "label": "Renderer:",
+                      "label": "Renderer",
                       "children": [
                         {
                           "type": "dropdown",
@@ -65,10 +63,6 @@
                               "selected": true,
                               "value": "mcm",
                               "label": "Multiple scattering"
-                            },
-                            {
-                              "value": "mcc",
-                              "label": "Multiple scattering (compute)"
                             }
                           ]
                         }
@@ -86,7 +80,7 @@
                   "children": [
                     {
                       "type": "field",
-                      "label": "Tone mapper:",
+                      "label": "Tone mapper",
                       "children": [
                         {
                           "type": "dropdown",
