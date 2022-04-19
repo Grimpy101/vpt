@@ -132,6 +132,7 @@ constructor() {
             } else {
                 window.dispatchEvent(new Event('change'));
                 this._generationContainer.revertFullScreen();
+                this._renderingContext.clearCanvas();
             }
 
             this._inFullScreen = !this._inFullScreen;
@@ -190,7 +191,8 @@ _handleRendererChange() {
     const which = this._mainDialog.getSelectedRenderer();
     this._renderingContext.chooseRenderer(which);
     const renderers = this._renderingContext.getRenderers();
-    for (const renderer of renderers) {
+    for (let i = 0; i < renderers.length; i++) {
+        const renderer = renderers[i];
         const { object, binds } = this._constructDialogFromProperties(renderer);
         this._rendererDialog = object;
         for (const name in binds) {
@@ -202,6 +204,8 @@ _handleRendererChange() {
                 }));
             });
         }
+        renderer.reset();
+        renderer.setTransferFunction(this._generationContainer.boxes[i].transferFunctionTexture)
     }
     const container = this._mainDialog.getRendererSettingsContainer()._element;
     this._rendererDialog.appendTo(container);

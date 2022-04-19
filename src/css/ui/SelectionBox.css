@@ -1,8 +1,6 @@
-/* #part /css/ui/SelectionBox */
-
 .selection-box {
-    width: 200px;
-    height: 200px;
+    width: 85%;
+    height: 85%;
     justify-self: center;
     align-self: start;
     box-sizing: content-box;
@@ -20,7 +18,7 @@
     width: 100%;
     height: 10px;
     /*This is bad.*/
-    top: 210px;
+    top: 95%;
     position: relative;
 }
 

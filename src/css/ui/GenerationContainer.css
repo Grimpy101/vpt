@@ -1,7 +1,5 @@
-/* #part /css/ui/GenerationContainer */
-
 .generation-container {
-    position: fixed;
+    position: absolute;
     left: 0;
     top: 0;
     display: grid;
@@ -11,7 +9,7 @@
 }
 
 .generation-container-fullscreen {
-    position: fixed;
+    position: absolute;
     left: 0;
     top: 0;
     z-index: -1;

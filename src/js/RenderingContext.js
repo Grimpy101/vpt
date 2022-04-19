@@ -116,6 +116,11 @@ _webglcontextrestoredHandler(e) {
     this._initGL();
 }
 
+clearCanvas() {
+    this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+    this._gl.clearColor(0.0, 0.0, 0.0, 1.0);
+}
+
 resize(width, height) {
     this._canvas.width = width;
     this._canvas.height = height;

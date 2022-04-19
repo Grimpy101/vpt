@@ -26,7 +26,7 @@ export class GenerationContainer extends EventTarget {
             }
         }
         console.log(this.radius)
-        this.radius = Math.max(this.radius * 0.9, 1);
+        this.radius = Math.max(this.radius * 0.9, 10);
         this.selectedBox = box;
         box.select();
 
@@ -56,6 +56,7 @@ export class GenerationContainer extends EventTarget {
         this.html.style.width = width + "px";
         this.html.style.height = height + "px";
         this.html.style.left = dWidth + "px";
+        this.dispatchEvent(new Event('change'));
     }
 
     fullScreen(mouseX, mouseY) {
