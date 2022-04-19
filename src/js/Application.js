@@ -13,6 +13,9 @@ import { EnvmapLoadDialog } from './dialogs/EnvmapLoadDialog.js';
 import { RenderingContext } from './RenderingContext.js';
 import { RenderingContextDialog } from './dialogs/RenderingContextDialog.js';
 
+import { GenerationContainer } from './ui/GenerationContainer.js'
+import { SelectionBox } from './ui/SelectionBox.js'
+
 export class Application {
 
 constructor() {
@@ -43,9 +46,11 @@ constructor() {
 
     // Moved this here to get width
     this._mainDialog = new MainDialog();
-    if (!this._renderingContext.hasComputeCapabilities()) {
+    // Moved this here because hasComputeCapabilities() is not a function!!!
+    // TODO: Check it it breaks anything!
+    /*if (!this._renderingContext.hasComputeCapabilities()) {
         this._mainDialog.disableMCC();
-    }
+    }*/
 
     window.addEventListener('resize', () => {
         const width = window.innerWidth;
@@ -185,9 +190,9 @@ _handleRendererChange() {
     const which = this._mainDialog.getSelectedRenderer();
     this._renderingContext.chooseRenderer(which);
     const renderers = this._renderingContext.getRenderers();
-    const { object, binds } = this._constructDialogFromProperties(renderer);
-    this._rendererDialog = object;
     for (const renderer of renderers) {
+        const { object, binds } = this._constructDialogFromProperties(renderer);
+        this._rendererDialog = object;
         for (const name in binds) {
             binds[name].addEventListener('change', e => {
                 const value = binds[name].getValue();

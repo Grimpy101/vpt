@@ -1,8 +1,4 @@
-// #part /js/ui/GenerationContainer
-
-// #link /html/ui/GenerationContainer
-
-class GenerationContainer extends EventTarget {
+export class GenerationContainer extends EventTarget {
 
     constructor() {
         super();

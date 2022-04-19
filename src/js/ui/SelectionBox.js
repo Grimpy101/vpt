@@ -1,9 +1,6 @@
-// #part /js/ui/SelectionBox
+import { TFGeneratedTexture } from "../TFGeneratedTexture.js";
 
-// #link /html/ui/SelectionBox
-// #link /js/TFGeneratedTexture
-
-class SelectionBox {
+export class SelectionBox {
 
     constructor() {
         this.parent = null;
