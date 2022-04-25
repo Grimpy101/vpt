@@ -191,10 +191,10 @@ _handleRendererChange() {
     const which = this._mainDialog.getSelectedRenderer();
     this._renderingContext.chooseRenderer(which);
     const renderers = this._renderingContext.getRenderers();
+    const { object, binds } = this._constructDialogFromProperties(renderers[0]);
+    this._rendererDialog = object;
     for (let i = 0; i < renderers.length; i++) {
         const renderer = renderers[i];
-        const { object, binds } = this._constructDialogFromProperties(renderer);
-        this._rendererDialog = object;
         for (const name in binds) {
             binds[name].addEventListener('change', e => {
                 const value = binds[name].getValue();
