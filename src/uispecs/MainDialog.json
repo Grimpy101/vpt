@@ -147,6 +147,10 @@
             "About": {
               "type": "panel",
               "bind": "about"
+            },
+            "TF Generator": {
+              "type": "panel",
+              "bind": "tfGalleryContainer"
             }
           }
         }

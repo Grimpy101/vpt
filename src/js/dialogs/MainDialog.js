@@ -50,6 +50,10 @@ getSelectedToneMapper() {
     return this._binds.toneMapperSelect.getValue();
 }
 
+getTFGalleryContainer() {
+    return this._binds.tfGalleryContainer;
+}
+
 _handleRendererChange() {
     this.dispatchEvent(new Event('rendererchange'));
 }

@@ -1,0 +1,45 @@
+{
+    "type": "panel",
+    "children": [
+        {
+            "type": "panel",
+            "children": [
+                {
+                    "type": "field",
+                    "children": [
+                        {
+                            "type": "button",
+                            "bind": "prevButton",
+                            "label": "Previous"
+                        }
+                    ]
+                },
+                {
+                    "type": "field",
+                    "children": [
+                        {
+                            "type": "button",
+                            "bind": "nextButton",
+                            "label": "Next"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "panel",
+            "children": [
+                {
+                    "type": "field",
+                    "children": [
+                        {
+                            "type": "button",
+                            "bind": "confirmButton",
+                            "label": "Finish"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

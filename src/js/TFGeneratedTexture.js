@@ -175,6 +175,13 @@ export class TFGeneratedTexture {
         this.transferFunctionTexture.fill(0);
     }
 
+    copy() {
+        const obj = {};
+        Object.assign(obj, this);
+        console.log(obj);
+        return obj;
+    }
+
     static exponentialDistribution(lambda) {
         let rand = Math.random();
         while (rand == 0) rand = Math.random();

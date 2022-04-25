@@ -9,6 +9,7 @@ import { ReaderFactory } from './readers/ReaderFactory.js';
 import { MainDialog } from './dialogs/MainDialog.js';
 import { VolumeLoadDialog } from './dialogs/VolumeLoadDialog.js';
 import { EnvmapLoadDialog } from './dialogs/EnvmapLoadDialog.js';
+import { TFGalleryDialog } from './dialogs/TFGalleryDialog.js';
 
 import { RenderingContext } from './RenderingContext.js';
 import { RenderingContextDialog } from './dialogs/RenderingContextDialog.js';
@@ -37,6 +38,9 @@ constructor() {
         renderers: Array(9).fill(null)
     });
     this._binds.container.appendChild(this._renderingContext.getCanvas());
+
+    this._allTransferFunctions = [];
+    this._transferFunctionIndex = 0;
 
     for(let i = 0; i < 9; i++) {
         let box = new SelectionBox();
@@ -99,6 +103,30 @@ constructor() {
         this._generationContainer.setAllNoiseSizes(num);
     });
 
+    this._tfGalleryDialog = new TFGalleryDialog();
+    this._tfGalleryDialog.appendTo(this._mainDialog.getTFGalleryContainer());
+    this._tfGalleryDialog.addEventListener('goback', () => {
+        if (this._transferFunctionIndex - 1 >= 0) {
+            this._transferFunctionIndex -= 1;
+            window.dispatchEvent(new Event('change', {
+                cause: 'goback'
+            }));
+            //console.log(this._allTransferFunctions);
+        }
+    });
+    this._tfGalleryDialog.addEventListener('goforth', () => {
+        if (this._transferFunctionIndex + 1 < this._allTransferFunctions.length) {
+            this._transferFunctionIndex += 1;
+            window.dispatchEvent(new Event('change'), {
+                cause: 'goforth'
+            });
+            //console.log(this._allTransferFunctions);
+        }
+    });
+    this._tfGalleryDialog.addEventListener('finish', () => {
+        console.log("wooohooo!");
+    });
+
     this._renderingContext.addEventListener('progress', e => {
         this._volumeLoadDialog._binds.loadProgress.setProgress(e.detail * 100);
     });
@@ -110,10 +138,18 @@ constructor() {
 
     this._generationContainer.addEventListener('change', () => {
         const renderers = this._renderingContext.getRenderers();
+        const tfBatch = [];
         for (let i = 0; i < renderers.length; i++) {
             renderers[i].reset();
-            renderers[i].setTransferFunction(this._generationContainer.boxes[i].transferFunctionTexture)
+            const tfTexture = this._generationContainer.boxes[i].transferFunctionTexture;
+            renderers[i].setTransferFunction(tfTexture)
+            tfBatch.push(structuredClone(tfTexture))
         }
+        let n = this._allTransferFunctions.length - this._transferFunctionIndex;
+        this._allTransferFunctions.splice(this._allTransferFunctions, n);
+        this._allTransferFunctions.push(tfBatch);
+        this._transferFunctionIndex += 1;
+        console.log(this._allTransferFunctions);
     });
 
     this._mouseX = 0;
@@ -138,6 +174,11 @@ constructor() {
             this._inFullScreen = !this._inFullScreen;
         }
     });
+}
+
+_tfCleanupFromIndex() {
+    let n = this._allTransferFunctions.length - this._transferFunctionIndex;
+    this._allTransferFunctions.splice(this._transferFunctionIndex, n);
 }
 
 _handleFileDrop(e) {
