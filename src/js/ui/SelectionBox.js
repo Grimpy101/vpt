@@ -17,7 +17,7 @@ export class SelectionBox {
         })
 
         // The size of TF is given here
-        this.transferFunctionTexture = new TFGeneratedTexture(50, 1);
+        this.transferFunctionTexture = new TFGeneratedTexture(255, 1);
     }
 
     updateTFTextureByRadius(texture, r) {
