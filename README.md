@@ -14,7 +14,7 @@ You need only `node` to build the framework and to run it.
 
 ```bash
 bin/packer
-bin/server-node
+bin/server-express
 ```
 
 There's a working build with a few demo datasets available [here](http://lgm.fri.uni-lj.si/~ziga).
