@@ -31,4 +31,8 @@ export class TFGalleryDialog extends AbstractDialog {
     _handleFinish() {
         this.dispatchEvent(new CustomEvent('finish'));
     }
+
+    getName() {
+        return this._binds.nameBox.getValue();
+    }
 }

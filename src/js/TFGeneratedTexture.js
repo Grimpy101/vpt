@@ -10,6 +10,9 @@ export class TFGeneratedTexture {
         this.alpha = 5;
         this.beta = 2;
 
+        this.history = [];
+        this.i = -1;
+
         this.generateRandomTexture(w, h);
     }
 
@@ -109,6 +112,27 @@ export class TFGeneratedTexture {
                 return;
             }
             this.texture[i] = Math.min(Math.max(elem, 0), 255);
+        }
+    }
+
+    addTextureToHistory() {
+        this.i += 1;
+        let offset = this.history.length - this.i;
+        this.history.splice(this.i, offset);
+        this.history.push(new Uint8Array(this.texture));
+    }
+
+    goForwardInHistory() {
+        if (this.i < this.history.length - 1) {
+            this.i += 1;
+            this.texture = this.history[this.i];
+        }
+    }
+
+    goBackInHistory() {
+        if (this.i >= 1) {
+            this.i -= 1;
+            this.texture = this.history[this.i];
         }
     }
 

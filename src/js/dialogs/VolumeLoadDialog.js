@@ -14,6 +14,7 @@ constructor(options) {
     this._handleDemoChange = this._handleDemoChange.bind(this);
 
     this._demos = [];
+    this.fileName = "";
 
     this._addEventListeners();
     this._loadDemoJson();
@@ -35,11 +36,13 @@ async _loadDemoJson() {
             this._binds.demo.addOption(demo.value, demo.label);
         });
     } catch (e) {
+        console.log(e);
         console.warn('demo-volumes.json not available');
     }
 }
 
 _getVolumeTypeFromURL(filename) {
+    this.fileName = filename;
     const exn = filename.split('.').pop().toLowerCase();
     const exnToType = {
         'bvp'  : 'bvp',

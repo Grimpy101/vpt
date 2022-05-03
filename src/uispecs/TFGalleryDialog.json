@@ -33,6 +33,21 @@
                     "type": "field",
                     "children": [
                         {
+                            "type": "textbox",
+                            "bind": "nameBox",
+                            "label": "Ime"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "panel",
+            "children": [
+                {
+                    "type": "field",
+                    "children": [
+                        {
                             "type": "button",
                             "bind": "confirmButton",
                             "label": "Finish"

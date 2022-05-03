@@ -26,6 +26,12 @@ constructor() {
     this._handleVolumeLoad = this._handleVolumeLoad.bind(this);
     this._handleEnvmapLoad = this._handleEnvmapLoad.bind(this);
 
+    this._tfUpdateEverything = this._tfUpdateEverything.bind(this);
+    this._enterFullScreen = this._enterFullScreen.bind(this);
+    this._moveBackInTime = this._moveBackInTime.bind(this);
+    this._moveForwardInTime = this._moveForwardInTime.bind(this);
+    this._finishTFSelection = this._finishTFSelection.bind(this);
+
     this._binds = DOMUtils.bind(document.body);
 
     // This is new, boxes to mark generated selection containers
@@ -38,9 +44,6 @@ constructor() {
         renderers: Array(9).fill(null)
     });
     this._binds.container.appendChild(this._renderingContext.getCanvas());
-
-    this._allTransferFunctions = [];
-    this._transferFunctionIndex = 0;
 
     for(let i = 0; i < 9; i++) {
         let box = new SelectionBox();
@@ -105,27 +108,9 @@ constructor() {
 
     this._tfGalleryDialog = new TFGalleryDialog();
     this._tfGalleryDialog.appendTo(this._mainDialog.getTFGalleryContainer());
-    this._tfGalleryDialog.addEventListener('goback', () => {
-        if (this._transferFunctionIndex - 1 >= 0) {
-            this._transferFunctionIndex -= 1;
-            window.dispatchEvent(new Event('change', {
-                cause: 'goback'
-            }));
-            //console.log(this._allTransferFunctions);
-        }
-    });
-    this._tfGalleryDialog.addEventListener('goforth', () => {
-        if (this._transferFunctionIndex + 1 < this._allTransferFunctions.length) {
-            this._transferFunctionIndex += 1;
-            window.dispatchEvent(new Event('change'), {
-                cause: 'goforth'
-            });
-            //console.log(this._allTransferFunctions);
-        }
-    });
-    this._tfGalleryDialog.addEventListener('finish', () => {
-        console.log("wooohooo!");
-    });
+    this._tfGalleryDialog.addEventListener('goback', this._moveBackInTime);
+    this._tfGalleryDialog.addEventListener('goforth', this._moveForwardInTime);
+    this._tfGalleryDialog.addEventListener('finish', this._finishTFSelection);
 
     this._renderingContext.addEventListener('progress', e => {
         this._volumeLoadDialog._binds.loadProgress.setProgress(e.detail * 100);
@@ -136,21 +121,8 @@ constructor() {
     this._handleRendererChange();
     this._handleToneMapperChange();
 
-    this._generationContainer.addEventListener('change', () => {
-        const renderers = this._renderingContext.getRenderers();
-        const tfBatch = [];
-        for (let i = 0; i < renderers.length; i++) {
-            renderers[i].reset();
-            const tfTexture = this._generationContainer.boxes[i].transferFunctionTexture;
-            renderers[i].setTransferFunction(tfTexture)
-            tfBatch.push(structuredClone(tfTexture))
-        }
-        let n = this._allTransferFunctions.length - this._transferFunctionIndex;
-        this._allTransferFunctions.splice(this._allTransferFunctions, n);
-        this._allTransferFunctions.push(tfBatch);
-        this._transferFunctionIndex += 1;
-        console.log(this._allTransferFunctions);
-    });
+    this._generationContainer.addEventListener('change', this._tfUpdateEverything);
+    this._tfUpdateEverything();
 
     this._mouseX = 0;
     this._mouseY = 0;
@@ -161,25 +133,99 @@ constructor() {
         this._mouseY = e.pageY;
     });
 
-    window.addEventListener('keydown', (e) => {
-        if (e.code == 'KeyF') {
-            if (!this._inFullScreen) {
-                this._generationContainer.fullScreen(this._mouseX, this._mouseY);
-            } else {
-                window.dispatchEvent(new Event('change'));
-                this._generationContainer.revertFullScreen();
-                this._renderingContext.clearCanvas();
-            }
+    window.addEventListener('keydown', this._enterFullScreen);
+}
 
-            this._inFullScreen = !this._inFullScreen;
+_tfUpdateEverything() {
+    const renderers = this._renderingContext.getRenderers();
+    const tfBatch = [];
+    for (let i = 0; i < renderers.length; i++) {
+        renderers[i].reset();
+        const tfTexture = this._generationContainer.boxes[i].transferFunctionTexture;
+        tfTexture.addTextureToHistory();
+        renderers[i].setTransferFunction(tfTexture);
+        tfBatch.push(structuredClone(tfTexture));
+    }
+}
+
+_moveBackInTime() {
+    const renderers = this._renderingContext.getRenderers();
+    const tfBatch = [];
+    for (let i = 0; i < renderers.length; i++) {
+        renderers[i].reset();
+        const tfTexture = this._generationContainer.boxes[i].transferFunctionTexture;
+        tfTexture.goBackInHistory();
+        renderers[i].setTransferFunction(tfTexture);
+        tfBatch.push(structuredClone(tfTexture));
+    }
+    this._generationContainer.goBackInHistory();
+}
+
+_moveForwardInTime() {
+    const renderers = this._renderingContext.getRenderers();
+    const tfBatch = [];
+    for (let i = 0; i < renderers.length; i++) {
+        renderers[i].reset();
+        const tfTexture = this._generationContainer.boxes[i].transferFunctionTexture;
+        tfTexture.goForwardInHistory();
+        renderers[i].setTransferFunction(tfTexture);
+        tfBatch.push(structuredClone(tfTexture));
+    }
+    this._generationContainer.goForwardInHistory();
+}
+
+_finishTFSelection() {
+    const tfPackage = {
+        tfHistory: [],
+        choiceHistory: [],
+        name: "Unknown",
+        fileName: ""
+    }
+    const boxes = this._generationContainer.boxes;
+    for (let i = 0; i < boxes.length; i++) {
+        const tfHistory = boxes[i].transferFunctionTexture.history;
+        for (let j = 0; j < tfHistory.length; j++) {
+            if (!tfPackage.tfHistory[j]) {
+                tfPackage.tfHistory[j] = [];
+            }
+            tfPackage.tfHistory[j][i] = Array.from(tfHistory[j]);
+        }
+    }
+    tfPackage.choiceHistory = this._generationContainer.history;
+    if (this._tfGalleryDialog.getName()) {
+        tfPackage.name = this._tfGalleryDialog.getName();
+    }
+
+    if (this._volumeLoadDialog.fileName) {
+        tfPackage.fileName = this._volumeLoadDialog.fileName;
+    }
+
+    fetch("/store", {
+        method: "POST",
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(tfPackage)
+    }).then(res => {
+        if (res.ok) {
+            console.log("Opravljeno!");
+            window.location.replace('thanks');
         }
     });
 }
 
-_tfCleanupFromIndex() {
-    let n = this._allTransferFunctions.length - this._transferFunctionIndex;
-    this._allTransferFunctions.splice(this._transferFunctionIndex, n);
+_enterFullScreen(e) {
+    if (e.code == 'KeyF') {
+        if (!this._inFullScreen) {
+            this._generationContainer.fullScreen(this._mouseX, this._mouseY);
+        } else {
+            window.dispatchEvent(new Event('change'));
+            this._generationContainer.revertFullScreen();
+            this._renderingContext.clearCanvas();
+        }
+
+        this._inFullScreen = !this._inFullScreen;
+    }
 }
+
 
 _handleFileDrop(e) {
     e.preventDefault();

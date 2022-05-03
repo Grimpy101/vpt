@@ -5,6 +5,10 @@ export class GenerationContainer extends EventTarget {
         this.html = document.createElement("div");
         this.html.classList.add("generation-container");
         this.boxes = [];
+
+        this.i = -1;
+        this.history = [];
+
         this.selectedBox = null;
         // What should radius be?
         this.radius = 250;
@@ -14,7 +18,27 @@ export class GenerationContainer extends EventTarget {
         object.appendChild(this.html);
     }
 
+    addTextureToHistory(boxNum) {
+        this.i += 1;
+        let offset = this.history.length - this.i;
+        this.history.splice(this.i, offset);
+        this.history.push(boxNum);
+    }
+
+    goForwardInHistory() {
+        if (this.i < this.history.length - 1) {
+            this.i += 1;
+        }
+    }
+
+    goBackInHistory() {
+        if (this.i >= 1) {
+            this.i -= 1;
+        }
+    }
+
     updateSelected(box) {
+        let boxNum = -1;
         for (let i = 0; i < this.boxes.length; i++) {
             if (this.boxes[i] != box) {
                 this.boxes[i].deselect();
@@ -23,12 +47,17 @@ export class GenerationContainer extends EventTarget {
                 } else {
                     this.boxes[i].updateTFTexture();
                 }
+            } else {
+                boxNum = i;
+                console.log(this.boxes[i].transferFunctionTexture.texture);
             }
         }
-        console.log(this.radius)
+        console.log(this.radius);
         this.radius = Math.max(this.radius * 0.9, 10);
         this.selectedBox = box;
         box.select();
+        
+        this.addTextureToHistory(boxNum);
 
         this.dispatchEvent(new Event('change'));
     }
@@ -101,4 +130,5 @@ export class GenerationContainer extends EventTarget {
         this.html.classList.remove("generation-container-fullscreen");
         this.html.classList.add("generation-container");
     }
+
 }
