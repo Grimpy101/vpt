@@ -79,6 +79,12 @@ static create(spec) {
                 case 'accordion':
                 case 'field':
                 case 'panel':
+                case 'textbox':
+                    let children = spec.children;
+                    if (children.length > 0 && children[0].enabled == false) {
+                        object.setEnabled(false);
+                    }
+                    console.log(spec);
                 case 'sidebar':
                     object.add(childObject);
                     break;

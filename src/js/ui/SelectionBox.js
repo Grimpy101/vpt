@@ -13,7 +13,9 @@ export class SelectionBox {
         this.html.appendChild(this.tfCanvas)
 
         this.html.addEventListener('click', () => {
-            this.parent.updateSelected(this);
+            if (this.parent.app._status == "ready") {
+                this.parent.updateSelected(this);
+            }
         })
 
         // The size of TF is given here

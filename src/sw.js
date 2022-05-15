@@ -29,21 +29,31 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  if (event.request.url.startsWith(self.location.origin)) {
-    event.respondWith(
-      caches.match(event.request).then(cachedResponse => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
+  if (!event.request.url.startsWith(self.location.origin)) {
+    return;
+  }
 
-        return caches.open(RUNTIME).then(cache => {
-          return fetch(event.request).then(response => {
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
+  event.respondWith(
+    caches.match(event.request).then(cachedResponse => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      return caches.open(RUNTIME).then(cache => {
+        return fetch(event.request).then(response => {
+          if (response.status === 206) {
+            return response;
+          } else {
             return cache.put(event.request, response.clone()).then(() => {
               return response;
             });
-          });
+          }
         });
-      })
-    );
-  }
+      });
+    })
+  );
 });

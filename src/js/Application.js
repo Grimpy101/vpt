@@ -35,7 +35,7 @@ constructor() {
     this._binds = DOMUtils.bind(document.body);
 
     // This is new, boxes to mark generated selection containers
-    this._generationContainer = new GenerationContainer();
+    this._generationContainer = new GenerationContainer(this);
     this._generationContainer.appendTo(document.body);
 
     // Also send the container to the rendering context
@@ -44,6 +44,8 @@ constructor() {
         renderers: Array(9).fill(null)
     });
     this._binds.container.appendChild(this._renderingContext.getCanvas());
+
+    this._status = "none";
 
     for(let i = 0; i < 9; i++) {
         let box = new SelectionBox();
@@ -71,7 +73,7 @@ constructor() {
     document.body.addEventListener('dragover', e => e.preventDefault());
     document.body.addEventListener('drop', this._handleFileDrop);
 
-    this._mainDialog = new MainDialog();
+    //this._mainDialog = new MainDialog();
 
     this._statusBar = new StatusBar();
     this._statusBar.appendTo(document.body);
@@ -122,7 +124,7 @@ constructor() {
     this._handleToneMapperChange();
 
     this._generationContainer.addEventListener('change', this._tfUpdateEverything);
-    this._tfUpdateEverything();
+    //this._tfUpdateEverything();
 
     this._mouseX = 0;
     this._mouseY = 0;
@@ -179,7 +181,7 @@ _finishTFSelection() {
         tfHistory: [],
         choiceHistory: [],
         name: "Unknown",
-        fileName: ""
+        volumeID: ""
     }
     const boxes = this._generationContainer.boxes;
     for (let i = 0; i < boxes.length; i++) {
@@ -197,7 +199,7 @@ _finishTFSelection() {
     }
 
     if (this._volumeLoadDialog.fileName) {
-        tfPackage.fileName = this._volumeLoadDialog.fileName;
+        tfPackage.volumeID = this._volumeLoadDialog.fileName;
     }
 
     fetch("/store", {
@@ -216,10 +218,12 @@ _enterFullScreen(e) {
     if (e.code == 'KeyF') {
         if (!this._inFullScreen) {
             this._generationContainer.fullScreen(this._mouseX, this._mouseY);
+            this._status = "fullscreen";
         } else {
             window.dispatchEvent(new Event('change'));
             this._generationContainer.revertFullScreen();
             this._renderingContext.clearCanvas();
+            this._status = "ready";
         }
 
         this._inFullScreen = !this._inFullScreen;
@@ -264,7 +268,7 @@ _constructDialogFromProperties(object) {
             panel.children.push({
                 type: 'field',
                 label: property.label,
-                children: [{ ...property, bind: property.name }]
+                children: [{ ...property, bind: property.name, enabled: false }]
             });
         }
     }
@@ -346,6 +350,7 @@ _handleVolumeLoad(e) {
             this._renderingContext.setVolume(reader);
         }
     }
+    this._status = "ready"
 }
 
 _handleEnvmapLoad(e) {

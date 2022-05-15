@@ -1,10 +1,11 @@
 export class GenerationContainer extends EventTarget {
 
-    constructor() {
+    constructor(app) {
         super();
         this.html = document.createElement("div");
         this.html.classList.add("generation-container");
         this.boxes = [];
+        this.app = app
 
         this.i = -1;
         this.history = [];

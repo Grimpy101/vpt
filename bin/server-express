@@ -2,6 +2,7 @@
 
 const express = require('express');
 const fs = require('fs');
+const path = require('path');
 const app = express();
 
 app.set('port', process.env.PORT || 3000);
@@ -32,6 +33,7 @@ app.post('/store', (req, res) => {
     const name = data.name;
     const today = new Date().toISOString();
     const fileName = "data/" + name + "_" + today + ".json";
+    fs.mkdirSync(path.dirname(fileName), { recursive: true });
     fs.writeFileSync(fileName, JSON.stringify(data));
     res.status(200).end();
 });

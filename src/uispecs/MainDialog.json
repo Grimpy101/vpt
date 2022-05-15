@@ -38,6 +38,7 @@
                         {
                           "type": "dropdown",
                           "bind": "rendererSelect",
+                          "enabled": false,
                           "options": [
                             {
                               "value": "mip",
