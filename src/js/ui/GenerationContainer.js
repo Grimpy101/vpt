@@ -50,10 +50,8 @@ export class GenerationContainer extends EventTarget {
                 }
             } else {
                 boxNum = i;
-                console.log(this.boxes[i].transferFunctionTexture.texture);
             }
         }
-        console.log(this.radius);
         this.radius = Math.max(this.radius * 0.9, 10);
         this.selectedBox = box;
         box.select();

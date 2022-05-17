@@ -202,7 +202,6 @@ export class TFGeneratedTexture {
     copy() {
         const obj = {};
         Object.assign(obj, this);
-        console.log(obj);
         return obj;
     }
 

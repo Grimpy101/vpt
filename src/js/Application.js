@@ -208,7 +208,6 @@ _finishTFSelection() {
         body: JSON.stringify(tfPackage)
     }).then(res => {
         if (res.ok) {
-            console.log("Opravljeno!");
             window.location.replace('thanks');
         }
     });
@@ -326,6 +325,7 @@ _handleToneMapperChange() {
 
 _handleVolumeLoad(e) {
     const options = e.detail;
+    console.log(options.dimensions);
     if (options.type === 'file') {
         const readerClass = ReaderFactory(options.filetype);
         if (readerClass) {
@@ -345,7 +345,12 @@ _handleVolumeLoad(e) {
         if (readerClass) {
             const loaderClass = LoaderFactory('ajax');
             const loader = new loaderClass(options.url);
-            const reader = new readerClass(loader);
+            const reader = new readerClass(loader, {
+                width   : options.dimensions.x,
+                height  : options.dimensions.y,
+                depth   : options.dimensions.z,
+                bits    : options.precision
+            });
             this._renderingContext.stopRendering();
             this._renderingContext.setVolume(reader);
         }

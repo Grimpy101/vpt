@@ -115,7 +115,6 @@ setTransferFunction(transferFunction) {
         gl.texImage2D(gl.TEXTURE_2D, 0,
             gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, transferFunction);
     } else if (transferFunction instanceof  TFGeneratedTexture) {
-        //console.log(transferFunction.texture);
         gl.texImage2D(gl.TEXTURE_2D, 0,
             gl.RGBA, transferFunction.width, transferFunction.height,
             0, gl.RGBA, gl.UNSIGNED_BYTE, transferFunction.texture)

@@ -1,7 +1,52 @@
 [
     {
-        "value": "Tooth",
-        "label": "Tooth.bvp",
-        "url": "demos/Tooth.bvp"
+        "value": "Aneurism",
+        "label": "Aneurism.raw",
+        "url": "demos/aneurism_256x256x256_1x1x1_uint8.raw",
+        "dimensions": {
+            "x": 256,
+            "y": 256,
+            "z": 256
+        }
+    },
+    {
+        "value": "Engine",
+        "label": "Engine.raw",
+        "url": "demos/engine_256x256x128_1x1x1_uint8.raw",
+        "dimensions": {
+            "x": 256,
+            "y": 256,
+            "z": 128
+        }
+    },
+    {
+        "value": "Lobster",
+         "label": "Lobster.raw",
+         "url": "demos/lobster_301x324x56_5x5x7_uint8.raw",
+         "dimensions": {
+             "x": 301,
+             "y": 324,
+             "z": 56
+         }
+    },
+    {
+        "value": "Knee",
+         "label": "ct_knee.raw",
+         "url": "demos/ct_knee_256_155_206_uint8_resampled.raw",
+         "dimensions": {
+             "x": 256,
+             "y": 155,
+             "z": 206
+         }
+    },
+    {
+        "value": "Body",
+         "label": "body.raw",
+         "url": "demos/body_256_256_113_uint8_resampled.raw",
+         "dimensions": {
+             "x": 256,
+             "y": 256,
+             "z": 113
+         }
     }
 ]

@@ -36,7 +36,6 @@ async _loadDemoJson() {
             this._binds.demo.addOption(demo.value, demo.label);
         });
     } catch (e) {
-        console.log(e);
         console.warn('demo-volumes.json not available');
     }
 }
@@ -99,11 +98,14 @@ _handleLoadDemo() {
     const demo = this._binds.demo.getValue();
     const found = this._demos.find(d => d.value === demo);
     const filetype = this._getVolumeTypeFromURL(found.url);
+    const dimensions = found.dimensions;
     this.dispatchEvent(new CustomEvent('load', {
         detail: {
             type     : 'url',
             url      : found.url,
             filetype : filetype,
+            dimensions: dimensions,
+            precision: 8
         }
     }));
 }
