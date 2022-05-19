@@ -1,7 +1,7 @@
 [
     {
         "value": "Aneurism",
-        "label": "Aneurism.raw",
+        "label": "Aneurism",
         "url": "demos/aneurism_256x256x256_1x1x1_uint8.raw",
         "dimensions": {
             "x": 256,
@@ -11,7 +11,7 @@
     },
     {
         "value": "Engine",
-        "label": "Engine.raw",
+        "label": "Engine",
         "url": "demos/engine_256x256x128_1x1x1_uint8.raw",
         "dimensions": {
             "x": 256,
@@ -21,7 +21,7 @@
     },
     {
         "value": "Lobster",
-         "label": "Lobster.raw",
+         "label": "Lobster",
          "url": "demos/lobster_301x324x56_5x5x7_uint8.raw",
          "dimensions": {
              "x": 301,
@@ -31,7 +31,7 @@
     },
     {
         "value": "Knee",
-         "label": "ct_knee.raw",
+         "label": "Knee",
          "url": "demos/ct_knee_256_155_206_uint8_resampled.raw",
          "dimensions": {
              "x": 256,
@@ -41,7 +41,7 @@
     },
     {
         "value": "Body",
-         "label": "body.raw",
+         "label": "Body",
          "url": "demos/body_256_256_113_uint8_resampled.raw",
          "dimensions": {
              "x": 256,
