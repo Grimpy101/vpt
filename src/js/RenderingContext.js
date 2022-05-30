@@ -132,6 +132,9 @@ async setVolume(reader) {
     this._volume.addEventListener('progress', e => {
         this.dispatchEvent(new CustomEvent('progress', { detail: e.detail }));
     });
+    this._volume.addEventListener('threshold', e => {
+        this.dispatchEvent(new CustomEvent('threshold', {detail: e.detail}));
+    });
     await this._volume.readMetadata();
     await this._volume.readModality('default');
     this._volume.setFilter(this._filter);

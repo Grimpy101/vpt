@@ -55,4 +55,8 @@ export class SelectionBox {
             this.html.classList.add("selection-box-deselected");
         }
     }
+
+    updateThreshold(threshold) {
+        this.transferFunctionTexture.alpha_threshold = threshold;
+    }
 }

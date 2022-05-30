@@ -130,4 +130,10 @@ export class GenerationContainer extends EventTarget {
         this.html.classList.add("generation-container");
     }
 
+    setThreshold(threshold) {
+        for (const box of this.boxes) {
+            box.updateThreshold(threshold);
+        }
+    }
+
 }

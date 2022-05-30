@@ -10,6 +10,8 @@ export class TFGeneratedTexture {
         this.alpha = 5;
         this.beta = 2;
 
+        this.alpha_threshold = 0;
+
         this.history = [];
         this.i = -1;
 
@@ -46,6 +48,7 @@ export class TFGeneratedTexture {
     }
 
     // Does this even make sense?
+    // UPDATE: Magic intensifies.
     someAlphaChannelMagic1() {
         let len = this.width * this.height;
         let startValue = 0;
@@ -54,7 +57,7 @@ export class TFGeneratedTexture {
         let flipSwitch = Math.round(Math.random());
         startValue = flipSwitch * 255;
         for (let i = 0; i < len; i++) {
-            if (TFGeneratedTexture.betaDistribution(this.alpha, this.beta) <= 0.5) {
+            if (TFGeneratedTexture.betaDistribution(5, 2) <= 0.5) {
                 indices.push(i);
                 this.texture[i] = flipSwitch * 255;
                 flipSwitch = (flipSwitch + 1) % 2;
@@ -75,6 +78,10 @@ export class TFGeneratedTexture {
             }
 
             if (indexCounter == end) indexCounter++;
+        }
+
+        for (let i = 0; i < this.alpha_threshold; i++) {
+            this.texture[i*4 + 3] = 0;
         }
     }
 

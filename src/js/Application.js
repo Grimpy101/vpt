@@ -118,6 +118,10 @@ constructor() {
         this._volumeLoadDialog._binds.loadProgress.setProgress(e.detail * 100);
     });
 
+    this._renderingContext.addEventListener('threshold', e => {
+        this._generationContainer.setThreshold(e.detail);
+    });
+
     this._mainDialog.addEventListener('rendererchange', this._handleRendererChange);
     this._mainDialog.addEventListener('tonemapperchange', this._handleToneMapperChange);
     this._handleRendererChange();
@@ -325,7 +329,7 @@ _handleToneMapperChange() {
 
 _handleVolumeLoad(e) {
     const options = e.detail;
-    console.log(options.dimensions);
+    //console.log(options.dimensions);
     if (options.type === 'file') {
         const readerClass = ReaderFactory(options.filetype);
         if (readerClass) {
