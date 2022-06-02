@@ -20,7 +20,8 @@
                 {
                   "type": "accordion",
                   "bind": "envmapLoadContainer",
-                  "label": "Environment"
+                  "label": "Environment",
+                  "contracted": true
                 }
               ]
             },
@@ -86,6 +87,7 @@
                         {
                           "type": "dropdown",
                           "bind": "toneMapperSelect",
+                          "enabled": false,
                           "options": [
                             {
                               "value": "artistic",
@@ -142,16 +144,13 @@
                   "type": "accordion",
                   "bind": "renderingContextSettingsContainer",
                   "label": "Context"
+                },
+                {
+                  "type": "accordion",
+                  "bind": "tfGeneratorSettingsContainer",
+                  "label": "TF Generator"
                 }
               ]
-            },
-            "About": {
-              "type": "panel",
-              "bind": "about"
-            },
-            "TF Generator": {
-              "type": "panel",
-              "bind": "tfGalleryContainer"
             }
           }
         }

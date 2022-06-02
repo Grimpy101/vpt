@@ -58,5 +58,6 @@ export class SelectionBox {
 
     updateThreshold(threshold) {
         this.transferFunctionTexture.alpha_threshold = threshold;
+        this.updateTFTexture();
     }
 }

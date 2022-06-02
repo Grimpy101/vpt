@@ -77,7 +77,10 @@ export class GenerationContainer extends EventTarget {
     }
 
     resize(width, height, object) {
-        const dWidth = object.clientWidth;
+        let dWidth = 0;
+        if (object) {
+            dWidth = object.clientWidth;
+        }
 
         width = width - dWidth;
 

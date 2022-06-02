@@ -75,8 +75,8 @@ constructor() {
 
     //this._mainDialog = new MainDialog();
 
-    this._statusBar = new StatusBar();
-    this._statusBar.appendTo(document.body);
+    //this._statusBar = new StatusBar();
+    //this._statusBar.appendTo(document.body);
 
     this._volumeLoadDialog = new VolumeLoadDialog();
     this._volumeLoadDialog.appendTo(this._mainDialog.getVolumeLoadContainer());
@@ -92,6 +92,7 @@ constructor() {
     this._renderingContextDialog.addEventListener('resolution', e => {
         const resolution = this._renderingContextDialog.resolution;
         this._renderingContext.setResolution(resolution);
+        this._generationContainer.resize(resolution, resolution, null);
     });
     this._renderingContextDialog.addEventListener('transformation', e => {
         const s = this._renderingContextDialog.scale;
@@ -103,13 +104,11 @@ constructor() {
         const filter = this._renderingContextDialog.filter;
         this._renderingContext.setFilter(filter);
     });
-    this._renderingContextDialog.addEventListener('noiseSize', e => {
-        let num = this._renderingContextDialog.noiseSize;
-        this._generationContainer.setAllNoiseSizes(num);
-    });
 
     this._tfGalleryDialog = new TFGalleryDialog();
-    this._tfGalleryDialog.appendTo(this._mainDialog.getTFGalleryContainer());
+    this._tfGalleryDialog.appendTo(
+        this._mainDialog.getTfGeneratorSettingsContainer()
+    );
     this._tfGalleryDialog.addEventListener('goback', this._moveBackInTime);
     this._tfGalleryDialog.addEventListener('goforth', this._moveForwardInTime);
     this._tfGalleryDialog.addEventListener('finish', this._finishTFSelection);
@@ -120,6 +119,7 @@ constructor() {
 
     this._renderingContext.addEventListener('threshold', e => {
         this._generationContainer.setThreshold(e.detail);
+        this._tfUpdateEverything();
     });
 
     this._mainDialog.addEventListener('rendererchange', this._handleRendererChange);
@@ -265,14 +265,26 @@ _constructDialogFromProperties(object) {
             panel.children.push({
                 type: 'accordion',
                 label: property.label,
-                children: [{ ...property, bind: property.name }]
+                children: [{ ...property, bind: property.name }],
+                contracted: true
             });
         } else {
-            panel.children.push({
-                type: 'field',
-                label: property.label,
-                children: [{ ...property, bind: property.name, enabled: false }]
-            });
+            if (property.label == "Steps" || property.label == "Midtones") {
+                panel.children.push({
+                    type: 'field',
+                    label: property.label,
+                    children: [{ ...property, bind: property.name }]
+                });
+            } else {
+                if (property.type == 'slider') {
+                    continue;
+                }
+                panel.children.push({
+                    type: 'field',
+                    label: property.label,
+                    children: [{ ...property, bind: property.name, enabled: false }]
+                });
+            }
         }
     }
     return UI.create(panel);
@@ -359,6 +371,14 @@ _handleVolumeLoad(e) {
             this._renderingContext.setVolume(reader);
             if (options.scale) {
                 this._renderingContext.setScale(options.scale.x, options.scale.y, options.scale.z);
+                console.log(this._renderingContextDialog._binds.scale);
+                this._renderingContextDialog._binds.scale.setValue(
+                    {
+                        x: options.scale.x,
+                        y: options.scale.y,
+                        z: options.scale.z
+                    }
+                );
             }
         }
     }

@@ -48,19 +48,6 @@
           "step": 0.1
         }
       ]
-    },
-    {
-      "type": "field",
-      "label": "Noise size:",
-      "children": [
-        {
-          "type": "spinner",
-          "bind": "noise_size",
-          "min": 0,
-          "max": 10,
-          "value": 0.05
-        }
-      ]
     }
   ]
 }

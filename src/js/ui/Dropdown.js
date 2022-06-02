@@ -17,6 +17,11 @@ constructor(options) {
     }
 }
 
+setEnabled(enabled) {
+    this._binds.input.disabled = !enabled;
+    super.setEnabled(enabled);
+}
+
 addOption(value, label, selected) {
     let option = document.createElement('option');
     option.value = value;

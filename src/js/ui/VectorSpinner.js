@@ -68,6 +68,10 @@ setValue(value) {
     this._spinnerX.setValue(value.x);
     this._spinnerY.setValue(value.y);
     this._spinnerZ.setValue(value.z);
+
+    this._spinnerX._binds.input.value = value.x;
+    this._spinnerY._binds.input.value = value.y;
+    this._spinnerZ._binds.input.value = value.z;
 }
 
 getValue() {

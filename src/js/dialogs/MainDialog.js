@@ -18,8 +18,8 @@ constructor(options) {
     this._binds.rendererSelect.addEventListener('change', this._handleRendererChange);
     this._binds.toneMapperSelect.addEventListener('change', this._handleToneMapperChange);
 
-    const about = DOMUtils.instantiate(aboutTemplate);
-    this._binds.about._element.appendChild(about);
+    //const about = DOMUtils.instantiate(aboutTemplate);
+    //this._binds.about._element.appendChild(about);
 }
 
 getVolumeLoadContainer() {
@@ -40,6 +40,10 @@ getToneMapperSettingsContainer() {
 
 getRenderingContextSettingsContainer() {
     return this._binds.renderingContextSettingsContainer;
+}
+
+getTfGeneratorSettingsContainer() {
+    return this._binds.tfGeneratorSettingsContainer;
 }
 
 getSelectedRenderer() {

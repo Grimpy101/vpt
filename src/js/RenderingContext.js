@@ -329,6 +329,8 @@ setResolution(resolution) {
     this._canvas.width = resolution;
     this._canvas.height = resolution;
 
+    this._camera.resize(resolution, resolution);
+
     for (let i = 0; i < this._renderers.length; i++) {
         if (this._renderers[i]) {
             this._renderers[i].setResolution(resolution);

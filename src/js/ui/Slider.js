@@ -27,6 +27,11 @@ constructor(options) {
     this._element.addEventListener('wheel', this._handleWheel);
 }
 
+/*setEnabled(enabled) {
+    this._binds.input.disabled = !enabled;
+    super.setEnabled(enabled);
+}*/
+
 destroy() {
     document.removeEventListener('pointerup', this._handlePointerUp);
     document.removeEventListener('pointermove', this._handlePointerMove);
