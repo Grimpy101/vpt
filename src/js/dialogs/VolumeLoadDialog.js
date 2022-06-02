@@ -99,12 +99,14 @@ _handleLoadDemo() {
     const found = this._demos.find(d => d.value === demo);
     const filetype = this._getVolumeTypeFromURL(found.url);
     const dimensions = found.dimensions;
+    const scale = (found.scale) ? found.scale : null;
     this.dispatchEvent(new CustomEvent('load', {
         detail: {
             type     : 'url',
             url      : found.url,
             filetype : filetype,
             dimensions: dimensions,
+            scale: scale,
             precision: 8
         }
     }));

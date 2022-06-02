@@ -357,6 +357,9 @@ _handleVolumeLoad(e) {
             });
             this._renderingContext.stopRendering();
             this._renderingContext.setVolume(reader);
+            if (options.scale) {
+                this._renderingContext.setScale(options.scale.x, options.scale.y, options.scale.z);
+            }
         }
     }
     this._status = "ready"
