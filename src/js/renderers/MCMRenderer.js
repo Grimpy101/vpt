@@ -16,17 +16,8 @@ constructor(gl, volume, environmentTexture, options) {
             name: 'extinction',
             label: 'Extinction',
             type: 'spinner',
-            enabled: 'false',
-            value: 100,
-            min: 0,
-        },
-        {
-            name: 'albedo',
-            label: 'Albedo',
-            type: 'slider',
             value: 1,
             min: 0,
-            max: 1,
         },
         {
             name: 'anisotropy',
@@ -34,14 +25,6 @@ constructor(gl, volume, environmentTexture, options) {
             type: 'slider',
             value: 0,
             min: -1,
-            max: 1,
-        },
-        {
-            name: 'ratio',
-            label: 'Majorant ratio',
-            type: 'slider',
-            value: 1,
-            min: 0,
             max: 1,
         },
         {
@@ -75,9 +58,7 @@ constructor(gl, volume, environmentTexture, options) {
 
         if ([
             'extinction',
-            'albedo',
             'anisotropy',
-            'ratio',
             'bounces',
             'transferFunction',
         ].includes(name)) {
@@ -159,10 +140,8 @@ _integrateFrame() {
     gl.uniform1f(uniforms.uRandSeed, Math.random());
     gl.uniform1f(uniforms.uBlur, 0);
 
-    gl.uniform1f(uniforms.uAbsorptionCoefficient, (1 - this.albedo) * this.extinction);
-    gl.uniform1f(uniforms.uScatteringCoefficient, this.albedo * this.extinction);
-    gl.uniform1f(uniforms.uScatteringBias, this.anisotropy);
-    gl.uniform1f(uniforms.uMajorant, this.extinction * this.ratio);
+    gl.uniform1f(uniforms.uExtinction, this.extinction);
+    gl.uniform1f(uniforms.uAnisotropy, this.anisotropy);
     gl.uniform1ui(uniforms.uMaxBounces, this.bounces);
     gl.uniform1ui(uniforms.uSteps, this.steps);
 

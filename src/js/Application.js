@@ -1,21 +1,17 @@
 import { DOMUtils } from './utils/DOMUtils.js';
 
-import { UI } from './ui/UI.js';
-import { StatusBar } from './ui/StatusBar.js';
+import './ui/UI.js';
 
 import { LoaderFactory } from './loaders/LoaderFactory.js';
 import { ReaderFactory } from './readers/ReaderFactory.js';
 
-import { MainDialog } from './dialogs/MainDialog.js';
-import { VolumeLoadDialog } from './dialogs/VolumeLoadDialog.js';
-import { EnvmapLoadDialog } from './dialogs/EnvmapLoadDialog.js';
-import { TFGalleryDialog } from './dialogs/TFGalleryDialog.js';
+import { MainDialog } from './dialogs/MainDialog/MainDialog.js';
+import { VolumeLoadDialog } from './dialogs/VolumeLoadDialog/VolumeLoadDialog.js';
+import { EnvmapLoadDialog } from './dialogs/EnvmapLoadDialog/EnvmapLoadDialog.js';
+import { RenderingContextDialog } from './dialogs/RenderingContextDialog/RenderingContextDialog.js';
+import { DialogConstructor } from './dialogs/DialogConstructor.js';
 
 import { RenderingContext } from './RenderingContext.js';
-import { RenderingContextDialog } from './dialogs/RenderingContextDialog.js';
-
-import { GenerationContainer } from './ui/GenerationContainer.js'
-import { SelectionBox } from './ui/SelectionBox.js'
 
 export class Application {
 
@@ -25,214 +21,72 @@ constructor() {
     this._handleToneMapperChange = this._handleToneMapperChange.bind(this);
     this._handleVolumeLoad = this._handleVolumeLoad.bind(this);
     this._handleEnvmapLoad = this._handleEnvmapLoad.bind(this);
+    this._handleRecordAnimation = this._handleRecordAnimation.bind(this);
 
-    this._tfUpdateEverything = this._tfUpdateEverything.bind(this);
-    this._enterFullScreen = this._enterFullScreen.bind(this);
-    this._moveBackInTime = this._moveBackInTime.bind(this);
-    this._moveForwardInTime = this._moveForwardInTime.bind(this);
-    this._finishTFSelection = this._finishTFSelection.bind(this);
+    this.binds = DOMUtils.bind(document.body);
 
-    this._binds = DOMUtils.bind(document.body);
-
-    // This is new, boxes to mark generated selection containers
-    this._generationContainer = new GenerationContainer(this);
-    this._generationContainer.appendTo(document.body);
-
-    // Also send the container to the rendering context
-    this._renderingContext = new RenderingContext({
-        generationContainer: this._generationContainer,
-        renderers: Array(9).fill(null)
-    });
-    this._binds.container.appendChild(this._renderingContext.getCanvas());
-
-    this._status = "none";
-
-    for(let i = 0; i < 9; i++) {
-        let box = new SelectionBox();
-        this._generationContainer.addBox(box);
-        box.setParent(this._generationContainer);
-    }
-
-    // Moved this here to get width
-    this._mainDialog = new MainDialog();
-    // Moved this here because hasComputeCapabilities() is not a function!!!
-    // TODO: Check it it breaks anything!
-    /*if (!this._renderingContext.hasComputeCapabilities()) {
-        this._mainDialog.disableMCC();
-    }*/
-
-    window.addEventListener('resize', () => {
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        this._renderingContext.resize(width, height);
-        // New, needs to always be the same size as canvas
-        this._generationContainer.resize(width, height, this._mainDialog._object._element);
-    });
-    window.dispatchEvent(new Event('resize'));
+    this.renderingContext = new RenderingContext();
+    this.binds.container.appendChild(this.renderingContext.getCanvas());
 
     document.body.addEventListener('dragover', e => e.preventDefault());
     document.body.addEventListener('drop', this._handleFileDrop);
 
-    //this._mainDialog = new MainDialog();
+    this.mainDialog = new MainDialog();
 
-    //this._statusBar = new StatusBar();
-    //this._statusBar.appendTo(document.body);
+    this.volumeLoadDialog = new VolumeLoadDialog();
+    this.mainDialog.getVolumeLoadContainer().appendChild(this.volumeLoadDialog.object);
+    this.volumeLoadDialog.addEventListener('load', this._handleVolumeLoad);
 
-    this._volumeLoadDialog = new VolumeLoadDialog();
-    this._volumeLoadDialog.appendTo(this._mainDialog.getVolumeLoadContainer());
-    this._volumeLoadDialog.addEventListener('load', this._handleVolumeLoad);
+    this.envmapLoadDialog = new EnvmapLoadDialog();
+    this.mainDialog.getEnvmapLoadContainer().appendChild(this.envmapLoadDialog.object);
+    this.envmapLoadDialog.addEventListener('load', this._handleEnvmapLoad);
 
-    this._envmapLoadDialog = new EnvmapLoadDialog();
-    this._envmapLoadDialog.appendTo(this._mainDialog.getEnvmapLoadContainer());
-    this._envmapLoadDialog.addEventListener('load', this._handleEnvmapLoad);
-
-    this._renderingContextDialog = new RenderingContextDialog();
-    this._renderingContextDialog.appendTo(
-        this._mainDialog.getRenderingContextSettingsContainer());
-    this._renderingContextDialog.addEventListener('resolution', e => {
-        const resolution = this._renderingContextDialog.resolution;
-        this._renderingContext.setResolution(resolution);
-        this._generationContainer.resize(resolution, resolution, null);
+    this.renderingContextDialog = new RenderingContextDialog();
+    this.mainDialog.getRenderingContextSettingsContainer().appendChild(
+            this.renderingContextDialog.object);
+    this.renderingContextDialog.addEventListener('resolution', e => {
+        const resolution = this.renderingContextDialog.resolution;
+        this.renderingContext.setResolution(resolution);
     });
-    this._renderingContextDialog.addEventListener('transformation', e => {
-        const s = this._renderingContextDialog.scale;
-        const t = this._renderingContextDialog.translation;
-        this._renderingContext.setScale(s.x, s.y, s.z);
-        this._renderingContext.setTranslation(t.x, t.y, t.z);
+    this.renderingContextDialog.addEventListener('transformation', e => {
+        const s = this.renderingContextDialog.scale;
+        const t = this.renderingContextDialog.translation;
+        this.renderingContext.setScale(...s);
+        this.renderingContext.setTranslation(...t);
     });
-    this._renderingContextDialog.addEventListener('filter', e => {
-        const filter = this._renderingContextDialog.filter;
-        this._renderingContext.setFilter(filter);
+    this.renderingContextDialog.addEventListener('filter', e => {
+        const filter = this.renderingContextDialog.filter;
+        this.renderingContext.setFilter(filter);
     });
-
-    this._tfGalleryDialog = new TFGalleryDialog();
-    this._tfGalleryDialog.appendTo(
-        this._mainDialog.getTfGeneratorSettingsContainer()
-    );
-    this._tfGalleryDialog.addEventListener('goback', this._moveBackInTime);
-    this._tfGalleryDialog.addEventListener('goforth', this._moveForwardInTime);
-    this._tfGalleryDialog.addEventListener('finish', this._finishTFSelection);
-
-    this._renderingContext.addEventListener('progress', e => {
-        this._volumeLoadDialog._binds.loadProgress.setProgress(e.detail * 100);
+    this.renderingContextDialog.addEventListener('fullscreen', e => {
+        this.renderingContext.getCanvas().classList.toggle('fullscreen',
+            this.renderingContextDialog.fullscreen);
     });
 
-    this._renderingContext.addEventListener('threshold', e => {
-        this._generationContainer.setThreshold(e.detail);
-        this._tfUpdateEverything();
+    new ResizeObserver(entries => {
+        const size = entries[0].contentBoxSize[0];
+        this.renderingContext._camera.resize(size.inlineSize, size.blockSize);
+    }).observe(this.renderingContext.getCanvas());
+
+    this.renderingContext.addEventListener('progress', e => {
+        this.volumeLoadDialog.binds.loadProgress.value = e.detail;
     });
 
-    this._mainDialog.addEventListener('rendererchange', this._handleRendererChange);
-    this._mainDialog.addEventListener('tonemapperchange', this._handleToneMapperChange);
+    this.renderingContext.addEventListener('animationprogress', e => {
+        this.mainDialog.binds.animationProgress.value = e.detail;
+    });
+
+    this.mainDialog.addEventListener('rendererchange', this._handleRendererChange);
+    this.mainDialog.addEventListener('tonemapperchange', this._handleToneMapperChange);
     this._handleRendererChange();
     this._handleToneMapperChange();
 
-    this._generationContainer.addEventListener('change', this._tfUpdateEverything);
-    //this._tfUpdateEverything();
-
-    this._mouseX = 0;
-    this._mouseY = 0;
-    this._inFullScreen = false;
-
-    window.addEventListener('mousemove', (e) => {
-        this._mouseX = e.pageX;
-        this._mouseY = e.pageY;
-    });
-
-    window.addEventListener('keydown', this._enterFullScreen);
+    this.mainDialog.addEventListener('recordanimation', this._handleRecordAnimation);
 }
 
-_tfUpdateEverything() {
-    const renderers = this._renderingContext.getRenderers();
-    const tfBatch = [];
-    for (let i = 0; i < renderers.length; i++) {
-        renderers[i].reset();
-        const tfTexture = this._generationContainer.boxes[i].transferFunctionTexture;
-        tfTexture.addTextureToHistory();
-        renderers[i].setTransferFunction(tfTexture);
-        tfBatch.push(structuredClone(tfTexture));
-    }
+async _handleRecordAnimation(e) {
+    this.renderingContext.recordAnimation(e.detail);
 }
-
-_moveBackInTime() {
-    const renderers = this._renderingContext.getRenderers();
-    const tfBatch = [];
-    for (let i = 0; i < renderers.length; i++) {
-        renderers[i].reset();
-        const tfTexture = this._generationContainer.boxes[i].transferFunctionTexture;
-        tfTexture.goBackInHistory();
-        renderers[i].setTransferFunction(tfTexture);
-        tfBatch.push(structuredClone(tfTexture));
-    }
-    this._generationContainer.goBackInHistory();
-}
-
-_moveForwardInTime() {
-    const renderers = this._renderingContext.getRenderers();
-    const tfBatch = [];
-    for (let i = 0; i < renderers.length; i++) {
-        renderers[i].reset();
-        const tfTexture = this._generationContainer.boxes[i].transferFunctionTexture;
-        tfTexture.goForwardInHistory();
-        renderers[i].setTransferFunction(tfTexture);
-        tfBatch.push(structuredClone(tfTexture));
-    }
-    this._generationContainer.goForwardInHistory();
-}
-
-_finishTFSelection() {
-    const tfPackage = {
-        tfHistory: [],
-        choiceHistory: [],
-        name: "Unknown",
-        volumeID: ""
-    }
-    const boxes = this._generationContainer.boxes;
-    for (let i = 0; i < boxes.length; i++) {
-        const tfHistory = boxes[i].transferFunctionTexture.history;
-        for (let j = 0; j < tfHistory.length; j++) {
-            if (!tfPackage.tfHistory[j]) {
-                tfPackage.tfHistory[j] = [];
-            }
-            tfPackage.tfHistory[j][i] = Array.from(tfHistory[j]);
-        }
-    }
-    tfPackage.choiceHistory = this._generationContainer.history;
-    if (this._tfGalleryDialog.getName()) {
-        tfPackage.name = this._tfGalleryDialog.getName();
-    }
-
-    if (this._volumeLoadDialog.fileName) {
-        tfPackage.volumeID = this._volumeLoadDialog.fileName;
-    }
-
-    fetch("/store", {
-        method: "POST",
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(tfPackage)
-    }).then(res => {
-        if (res.ok) {
-            window.location.replace('thanks');
-        }
-    });
-}
-
-_enterFullScreen(e) {
-    if (e.code == 'KeyF') {
-        if (!this._inFullScreen) {
-            this._generationContainer.fullScreen(this._mouseX, this._mouseY);
-            this._status = "fullscreen";
-        } else {
-            window.dispatchEvent(new Event('change'));
-            this._generationContainer.revertFullScreen();
-            this._renderingContext.clearCanvas();
-            this._status = "ready";
-        }
-
-        this._inFullScreen = !this._inFullScreen;
-    }
-}
-
 
 _handleFileDrop(e) {
     e.preventDefault();
@@ -255,134 +109,80 @@ _handleFileDrop(e) {
     }));
 }
 
-_constructDialogFromProperties(object) {
-    const panel = {
-        type: 'panel',
-        children: [],
-    };
-    for (const property of object.properties) {
-        if (property.type === 'transfer-function') {
-            panel.children.push({
-                type: 'accordion',
-                label: property.label,
-                children: [{ ...property, bind: property.name }],
-                contracted: true
-            });
-        } else {
-            if (property.label == "Steps" || property.label == "Midtones") {
-                panel.children.push({
-                    type: 'field',
-                    label: property.label,
-                    children: [{ ...property, bind: property.name }]
-                });
-            } else {
-                if (property.type == 'slider') {
-                    continue;
-                }
-                panel.children.push({
-                    type: 'field',
-                    label: property.label,
-                    children: [{ ...property, bind: property.name, enabled: false }]
-                });
-            }
-        }
-    }
-    return UI.create(panel);
-}
-
 _handleRendererChange() {
-    if (this._rendererDialog) {
-        this._rendererDialog.destroy();
+    if (this.rendererDialog) {
+        this.rendererDialog.remove();
     }
-    const which = this._mainDialog.getSelectedRenderer();
-    this._renderingContext.chooseRenderer(which);
-    const renderers = this._renderingContext.getRenderers();
-    const { object, binds } = this._constructDialogFromProperties(renderers[0]);
-    this._rendererDialog = object;
-    for (let i = 0; i < renderers.length; i++) {
-        const renderer = renderers[i];
-        for (const name in binds) {
-            binds[name].addEventListener('change', e => {
-                const value = binds[name].getValue();
-                renderer[name] = value;
-                renderer.dispatchEvent(new CustomEvent('change', {
-                    detail: { name, value }
-                }));
-            });
-        }
-        renderer.reset();
-        renderer.setTransferFunction(this._generationContainer.boxes[i].transferFunctionTexture)
+
+    const which = this.mainDialog.getSelectedRenderer();
+    this.renderingContext.chooseRenderer(which);
+    const renderer = this.renderingContext.getRenderer();
+    const object = DialogConstructor.construct(renderer.properties);
+    const binds = DOMUtils.bind(object);
+    this.rendererDialog = object;
+    for (const name in binds) {
+        binds[name].addEventListener('change', e => {
+            const value = binds[name].value;
+            renderer[name] = value;
+            renderer.dispatchEvent(new CustomEvent('change', {
+                detail: { name, value }
+            }));
+        });
     }
-    const container = this._mainDialog.getRendererSettingsContainer()._element;
-    this._rendererDialog.appendTo(container);
+    const container = this.mainDialog.getRendererSettingsContainer();
+    container.appendChild(this.rendererDialog);
 }
 
 _handleToneMapperChange() {
-    if (this._toneMapperDialog) {
-        this._toneMapperDialog.destroy();
+    if (this.toneMapperDialog) {
+        this.toneMapperDialog.remove();
     }
-    const which = this._mainDialog.getSelectedToneMapper();
-    this._renderingContext.chooseToneMapper(which);
-    const toneMapper = this._renderingContext.getToneMapper();
-    const { object, binds } = this._constructDialogFromProperties(toneMapper);
-    this._toneMapperDialog = object;
+
+    const which = this.mainDialog.getSelectedToneMapper();
+    this.renderingContext.chooseToneMapper(which);
+    const toneMapper = this.renderingContext.getToneMapper();
+    const object = DialogConstructor.construct(toneMapper.properties);
+    const binds = DOMUtils.bind(object);
+    this.toneMapperDialog = object;
     for (const name in binds) {
         binds[name].addEventListener('change', e => {
-            const value = binds[name].getValue();
+            const value = binds[name].value;
             toneMapper[name] = value;
             toneMapper.dispatchEvent(new CustomEvent('change', {
                 detail: { name, value }
             }));
         });
     }
-    const container = this._mainDialog.getToneMapperSettingsContainer()._element;
-    this._toneMapperDialog.appendTo(container);
+    const container = this.mainDialog.getToneMapperSettingsContainer();
+    container.appendChild(this.toneMapperDialog);
 }
 
 _handleVolumeLoad(e) {
     const options = e.detail;
-    //console.log(options.dimensions);
     if (options.type === 'file') {
         const readerClass = ReaderFactory(options.filetype);
         if (readerClass) {
             const loaderClass = LoaderFactory('blob');
             const loader = new loaderClass(options.file);
             const reader = new readerClass(loader, {
-                width  : options.dimensions.x,
-                height : options.dimensions.y,
-                depth  : options.dimensions.z,
+                width  : options.dimensions[0],
+                height : options.dimensions[1],
+                depth  : options.dimensions[2],
                 bits   : options.precision,
             });
-            this._renderingContext.stopRendering();
-            this._renderingContext.setVolume(reader);
+            this.renderingContext.stopRendering();
+            this.renderingContext.setVolume(reader);
         }
     } else if (options.type === 'url') {
         const readerClass = ReaderFactory(options.filetype);
         if (readerClass) {
             const loaderClass = LoaderFactory('ajax');
             const loader = new loaderClass(options.url);
-            const reader = new readerClass(loader, {
-                width   : options.dimensions.x,
-                height  : options.dimensions.y,
-                depth   : options.dimensions.z,
-                bits    : options.precision
-            });
-            this._renderingContext.stopRendering();
-            this._renderingContext.setVolume(reader);
-            if (options.scale) {
-                this._renderingContext.setScale(options.scale.x, options.scale.y, options.scale.z);
-                console.log(this._renderingContextDialog._binds.scale);
-                this._renderingContextDialog._binds.scale.setValue(
-                    {
-                        x: options.scale.x,
-                        y: options.scale.y,
-                        z: options.scale.z
-                    }
-                );
-            }
+            const reader = new readerClass(loader);
+            this.renderingContext.stopRendering();
+            this.renderingContext.setVolume(reader);
         }
     }
-    this._status = "ready"
 }
 
 _handleEnvmapLoad(e) {
@@ -390,11 +190,8 @@ _handleEnvmapLoad(e) {
     let image = new Image();
     image.crossOrigin = 'anonymous';
     image.addEventListener('load', () => {
-        this._renderingContext.setEnvironmentMap(image);
-        const renderers = this._renderingContext.getRenderers();
-        for (let i = 0; i < renderers.length; i++) {
-            renderers[i].reset();
-        }
+        this.renderingContext.setEnvironmentMap(image);
+        this.renderingContext.getRenderer().reset();
     });
 
     if (options.type === 'file') {

@@ -16,9 +16,7 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/terier/vpt#readme",
   "dependencies": {
-    "cookie-parser": "^1.4.6",
-    "express": "latest",
-    "express-session": "^1.17.2"
+    "express": "latest"
   },
   "engines": {
     "node": "12.x"

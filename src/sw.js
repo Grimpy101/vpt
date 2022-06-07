@@ -45,13 +45,9 @@ self.addEventListener('fetch', event => {
 
       return caches.open(RUNTIME).then(cache => {
         return fetch(event.request).then(response => {
-          if (response.status === 206) {
+          return cache.put(event.request, response.clone()).then(() => {
             return response;
-          } else {
-            return cache.put(event.request, response.clone()).then(() => {
-              return response;
-            });
-          }
+          });
         });
       });
     })

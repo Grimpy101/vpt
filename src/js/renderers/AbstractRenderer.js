@@ -3,7 +3,6 @@ import { Matrix } from '../math/Matrix.js';
 import { WebGL } from '../WebGL.js';
 import { SingleBuffer } from '../SingleBuffer.js';
 import { DoubleBuffer } from '../DoubleBuffer.js';
-import { TFGeneratedTexture } from '../TFGeneratedTexture.js';
 
 const [ SHADERS, MIXINS ] = await Promise.all([
     'shaders.json',
@@ -29,6 +28,11 @@ constructor(gl, volume, environmentTexture, options) {
         width  : 2,
         height : 1,
         data   : new Uint8Array([255, 0, 0, 0, 255, 0, 0, 255]),
+
+        internalFormat: gl.SRGB8_ALPHA8,
+        format : gl.RGBA,
+        type   : gl.UNSIGNED_BYTE,
+
         wrapS  : gl.CLAMP_TO_EDGE,
         wrapT  : gl.CLAMP_TO_EDGE,
         min    : gl.LINEAR,
@@ -109,17 +113,8 @@ setVolume(volume) {
 setTransferFunction(transferFunction) {
     const gl = this._gl;
     gl.bindTexture(gl.TEXTURE_2D, this._transferFunction);
-
-    // This can now accept either canvas or my generated texture
-    if (transferFunction instanceof  HTMLCanvasElement) {
-        gl.texImage2D(gl.TEXTURE_2D, 0,
-            gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, transferFunction);
-    } else if (transferFunction instanceof  TFGeneratedTexture) {
-        gl.texImage2D(gl.TEXTURE_2D, 0,
-            gl.RGBA, transferFunction.width, transferFunction.height,
-            0, gl.RGBA, gl.UNSIGNED_BYTE, transferFunction.texture)
-    }
-    gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.texImage2D(gl.TEXTURE_2D, 0,
+        gl.SRGB8_ALPHA8, gl.RGBA, gl.UNSIGNED_BYTE, transferFunction);
 }
 
 setResolution(resolution) {
