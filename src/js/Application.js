@@ -95,18 +95,21 @@ _handleFileDrop(e) {
         return;
     }
     const file = files[0];
-    if (!file.name.toLowerCase().endsWith('.bvp')) {
-        throw new Error('Filename extension must be .bvp');
+    if (file.name.toLowerCase().endsWith('.bvp')) {
+        this._handleVolumeLoad(new CustomEvent('load', {
+            detail: {
+                type       : 'file',
+                file       : file,
+                filetype   : 'bvp',
+                dimensions : { x: 0, y: 0, z: 0 }, // doesn't matter
+                precision  : 8, // doesn't matter
+            }
+        }));
+    } else if (file.name.toLowerCase().endsWith('.json')) {
+        console.log(file);
+    } else {
+        throw new Error('Filename extension must be .bvp or .json');
     }
-    this._handleVolumeLoad(new CustomEvent('load', {
-        detail: {
-            type       : 'file',
-            file       : file,
-            filetype   : 'bvp',
-            dimensions : { x: 0, y: 0, z: 0 }, // doesn't matter
-            precision  : 8, // doesn't matter
-        }
-    }));
 }
 
 _handleRendererChange() {
