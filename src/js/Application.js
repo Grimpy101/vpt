@@ -106,7 +106,31 @@ _handleFileDrop(e) {
             }
         }));
     } else if (file.name.toLowerCase().endsWith('.json')) {
-        console.log(file);
+        file.slice().arrayBuffer().then(
+            response => {
+                let chars = new Uint8Array(response);
+                let string = new TextDecoder("utf-8").decode(chars);
+                let json = JSON.parse(string);
+
+                let choice = json.choiceHistory[json.choiceHistory.length - 1];
+                const tf = json.tfHistory[json.tfHistory.length - 1][choice];
+                const volumeFile = json.volumeID;
+
+                let dimensions = [255, 255, 255];
+                let precision = 8;
+
+                this._handleVolumeLoad(new CustomEvent('load', {
+                    detail: {
+                        type        : 'url',
+                        url         : volumeFile,
+                        filetype    : 'raw',
+                        dimensions  : dimensions,
+                        precision   : precision,
+                        tf          : tf
+                    }
+                }));
+            }
+        )
     } else {
         throw new Error('Filename extension must be .bvp or .json');
     }
@@ -181,8 +205,14 @@ _handleVolumeLoad(e) {
         if (readerClass) {
             const loaderClass = LoaderFactory('ajax');
             const loader = new loaderClass(options.url);
-            const reader = new readerClass(loader);
+            const reader = new readerClass(loader, {
+                width   : options.dimensions[0],
+                height  : options.dimensions[1],
+                depth   : options.dimensions[2],
+                bits    : options.precision,
+            });
             this.renderingContext.stopRendering();
+            this.renderingContext.getRenderer().setTransferFunction(options.tf);
             this.renderingContext.setVolume(reader);
         }
     }

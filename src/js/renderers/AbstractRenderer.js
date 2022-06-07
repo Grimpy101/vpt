@@ -113,8 +113,16 @@ setVolume(volume) {
 setTransferFunction(transferFunction) {
     const gl = this._gl;
     gl.bindTexture(gl.TEXTURE_2D, this._transferFunction);
-    gl.texImage2D(gl.TEXTURE_2D, 0,
-        gl.SRGB8_ALPHA8, gl.RGBA, gl.UNSIGNED_BYTE, transferFunction);
+    console.log(transferFunction);
+    if (transferFunction instanceof  HTMLCanvasElement) {
+        gl.texImage2D(gl.TEXTURE_2D, 0,
+            gl.SRGB8_ALPHA8, gl.RGBA, gl.UNSIGNED_BYTE, transferFunction);
+    } else if (transferFunction instanceof Array) {
+        gl.texImage2D(gl.TEXTURE_2D, 0,
+            gl.RGBA, 255, 1,
+            0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(transferFunction))
+    }
+    this.transferFunction = transferFunction;
 }
 
 setResolution(resolution) {
