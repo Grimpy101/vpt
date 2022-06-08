@@ -49,6 +49,7 @@ constructor(options) {
     this._camera.updateMatrices();
 
     this._cameraController = new OrbitCameraController(this._camera, this._canvas);
+    this._camera.zoom(-1.2);
 
     this._volume = new Volume(this._gl);
     this._scale = new Vector(1, 1, 1);
@@ -127,8 +128,8 @@ resize(width, height) {
     this._camera.resize(width, height);
 }
 
-async setVolume(reader) {
-    this._volume = new Volume(this._gl, reader);
+async setVolume(reader, options) {
+    this._volume = new Volume(this._gl, reader, options);
     this._volume.addEventListener('progress', e => {
         this.dispatchEvent(new CustomEvent('progress', { detail: e.detail }));
     });

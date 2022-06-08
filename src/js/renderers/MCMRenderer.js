@@ -19,6 +19,7 @@ constructor(gl, volume, environmentTexture, options) {
             enabled: 'false',
             value: 100,
             min: 0,
+            visible: false
         },
         {
             name: 'albedo',
@@ -27,6 +28,7 @@ constructor(gl, volume, environmentTexture, options) {
             value: 1,
             min: 0,
             max: 1,
+            visible: false
         },
         {
             name: 'anisotropy',
@@ -35,6 +37,7 @@ constructor(gl, volume, environmentTexture, options) {
             value: 0,
             min: -1,
             max: 1,
+            visible: false
         },
         {
             name: 'ratio',
@@ -43,6 +46,7 @@ constructor(gl, volume, environmentTexture, options) {
             value: 1,
             min: 0,
             max: 1,
+            visible: false
         },
         {
             name: 'bounces',
@@ -50,6 +54,7 @@ constructor(gl, volume, environmentTexture, options) {
             type: 'spinner',
             value: 8,
             min: 0,
+            visible: false
         },
         {
             name: 'steps',
@@ -57,6 +62,7 @@ constructor(gl, volume, environmentTexture, options) {
             type: 'spinner',
             value: 8,
             min: 0,
+            visible: true
         },
         {
             name: 'transferFunction',

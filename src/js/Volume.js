@@ -16,8 +16,6 @@ constructor(gl, reader, options) {
     this.modalities = null;
     this.blocks     = null;
     this._texture   = null;
-
-    this.threshold = 0;
 }
 
 destroy() {
@@ -80,11 +78,13 @@ async readModality(modalityName) {
     for (const [index, placement] of modality.placements.entries()) {
         const data = await this._reader.readBlock(placement.index);
         
-        const dataArray = new Uint8Array(data);
-        for (let arrayItem of dataArray) {
-            maxValue = Math.max(maxValue, arrayItem);
+        if (!this.threshold) {
+            const dataArray = new Uint8Array(data);
+            for (let arrayItem of dataArray) {
+                maxValue = Math.max(maxValue, arrayItem);
+            }
+            typedData.push(...dataArray);
         }
-        typedData.push(...dataArray);
 
         const progress = (placement.index + 1) / modality.placements.length;
         this.dispatchEvent(new CustomEvent('progress', { detail: progress }));
@@ -98,8 +98,11 @@ async readModality(modalityName) {
             modality.format, modality.type, this._typize(data, modality.type));
     }
 
-    this.methodOtsu(typedData, maxValue);
-
+    if (!this.threshold) {
+        this.methodOtsu(typedData, maxValue);
+    } else {
+        this.dispatchEvent(new CustomEvent('threshold', { detail: this.threshold }));
+    }
 
     this.ready = true;
 }

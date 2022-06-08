@@ -48,6 +48,7 @@ resize(width, height) {
 }
 
 zoom(amount) {
+    console.log(amount);
     const scale = Math.exp(amount);
     this.zoomFactor *= scale;
     this.fovX *= scale;

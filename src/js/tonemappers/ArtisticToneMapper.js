@@ -17,12 +17,14 @@ constructor(gl, texture, options) {
             label: 'Low',
             type: 'spinner',
             value: 0,
+            visible: false
         },
         {
             name: 'high',
             label: 'High',
             type: 'spinner',
             value: 1,
+            visible: false
         },
         {
             name: 'mid',
@@ -31,12 +33,14 @@ constructor(gl, texture, options) {
             value: 0.5,
             min: 0.00001,
             max: 0.99999,
+            visible: true
         },
         {
             name: 'saturation',
             label: 'Saturation',
             type: 'spinner',
             value: 1,
+            visible: false
         },
     ]);
 

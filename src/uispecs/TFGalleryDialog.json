@@ -31,22 +31,6 @@
             "children": [
                 {
                     "type": "field",
-                    "label": "Dataset label",
-                    "children": [
-                        {
-                            "type": "textbox",
-                            "bind": "nameBox",
-                            "label": "Ime"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "type": "panel",
-            "children": [
-                {
-                    "type": "field",
                     "children": [
                         {
                             "type": "button",

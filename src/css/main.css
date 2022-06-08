@@ -42,3 +42,34 @@ input {
 .invisible {
     display: none !important;
 }
+
+.overlay_black {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+}
+
+.popup_instructions {
+    margin: 200px auto;
+    z-index: 101;
+}
+
+.popup_instructions > p {
+    font-size: 1.2em;
+    max-width: 500px;
+}
+
+.popup_instructions > div {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.popup_instructions button {
+    font-size: 1.2em;
+    padding: 5px;
+}

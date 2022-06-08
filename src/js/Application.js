@@ -140,6 +140,43 @@ constructor() {
     });
 
     window.addEventListener('keydown', this._enterFullScreen);
+
+    this._createHelperDialog();
+}
+
+_createHelperDialog() {
+    const overlay = document.createElement('div');
+    const helperDialog = document.createElement('dialog');
+    const helperText = document.createElement('p');
+    const instructionsBtn = document.createElement('button');
+    const closeBtn = document.createElement('button');
+    const btnDiv = document.createElement('div');
+
+    helperText.innerHTML = "Dobrodošli! Če ste tukaj prvič, si lahko s pomočjo spodnjega gumba ogledate navodila za uporabo ali pa zaprete to okno in pričnete.";
+
+    instructionsBtn.innerHTML = "Navodila za uporabo";
+    instructionsBtn.addEventListener('click', () => {
+        window.open('https://github.com/Grimpy101/vpt/blob/master/instructions/instructions.pdf', '_blank');
+    });
+    closeBtn.innerHTML = "Zapri";
+    closeBtn.addEventListener('click', () => {
+        helperDialog.open = false;
+        overlay.style['display'] = 'None';
+    });
+
+    btnDiv.appendChild(instructionsBtn);
+    btnDiv.appendChild(closeBtn);
+
+    helperDialog.appendChild(helperText);
+    helperDialog.appendChild(btnDiv);
+
+    helperDialog.open = true;
+
+    overlay.classList.add('overlay_black');
+    helperDialog.classList.add('popup_instructions');
+
+    document.body.appendChild(overlay);
+    document.body.appendChild(helperDialog);
 }
 
 _tfUpdateEverything() {
@@ -198,9 +235,6 @@ _finishTFSelection() {
         }
     }
     tfPackage.choiceHistory = this._generationContainer.history;
-    if (this._tfGalleryDialog.getName()) {
-        tfPackage.name = this._tfGalleryDialog.getName();
-    }
 
     if (this._volumeLoadDialog.fileName) {
         tfPackage.volumeID = this._volumeLoadDialog.fileName;
@@ -266,10 +300,18 @@ _constructDialogFromProperties(object) {
                 type: 'accordion',
                 label: property.label,
                 children: [{ ...property, bind: property.name }],
-                contracted: true
+                contracted: true,
+                visible: false
             });
         } else {
-            if (property.label == "Steps" || property.label == "Midtones") {
+            if (property.visible == true) {
+                panel.children.push({
+                    type: 'field',
+                    label: property.label,
+                    children: [{...property, bind: property.name }]
+                })
+            }
+            /*if (property.label == "Steps" || property.label == "Midtones") {
                 panel.children.push({
                     type: 'field',
                     label: property.label,
@@ -284,7 +326,7 @@ _constructDialogFromProperties(object) {
                     label: property.label,
                     children: [{ ...property, bind: property.name, enabled: false }]
                 });
-            }
+            }*/
         }
     }
     return UI.create(panel);
@@ -368,10 +410,11 @@ _handleVolumeLoad(e) {
                 bits    : options.precision
             });
             this._renderingContext.stopRendering();
-            this._renderingContext.setVolume(reader);
+            this._renderingContext.setVolume(reader, {
+                threshold: options.threshold
+            });
             if (options.scale) {
                 this._renderingContext.setScale(options.scale.x, options.scale.y, options.scale.z);
-                console.log(this._renderingContextDialog._binds.scale);
                 this._renderingContextDialog._binds.scale.setValue(
                     {
                         x: options.scale.x,

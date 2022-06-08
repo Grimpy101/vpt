@@ -4,6 +4,7 @@
     {
       "type": "field",
       "label": "Type",
+      "visible": false,
       "children": [
         {
           "type": "dropdown",

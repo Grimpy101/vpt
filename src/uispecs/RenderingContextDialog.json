@@ -1,5 +1,6 @@
 {
   "type": "panel",
+  "visible": false,
   "children": [
     {
       "type": "field",

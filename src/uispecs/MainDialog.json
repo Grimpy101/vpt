@@ -35,6 +35,7 @@
                     {
                       "type": "field",
                       "label": "Renderer",
+                      "visible": false,
                       "children": [
                         {
                           "type": "dropdown",
@@ -83,6 +84,7 @@
                     {
                       "type": "field",
                       "label": "Tone mapper",
+                      "visible": false,
                       "children": [
                         {
                           "type": "dropdown",
@@ -143,7 +145,8 @@
                 {
                   "type": "accordion",
                   "bind": "renderingContextSettingsContainer",
-                  "label": "Context"
+                  "label": "Context",
+                  "visible": false
                 },
                 {
                   "type": "accordion",
