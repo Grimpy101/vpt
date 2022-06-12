@@ -282,7 +282,11 @@ _render() {
         }
         this._toneMapper.render();
 
-        gl.viewport(x, y, w, h);
+        if (boxes[i].fullscreen) {
+            gl.viewport(x * 2, y * 2, w * 2, h * 2);
+        } else {
+            gl.viewport(x, y, w, h);
+        }
         const program = this._program;
         gl.useProgram(program.program);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);

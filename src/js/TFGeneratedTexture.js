@@ -44,7 +44,7 @@ export class TFGeneratedTexture {
             this.texture[i+3] = perlin2 * 255;
         }
 
-        this.someAlphaChannelMagic1();
+        this.someAlphaChannelMagic2();
     }
 
     // Does this even make sense?
@@ -85,6 +85,35 @@ export class TFGeneratedTexture {
         }
     }
 
+    someAlphaChannelMagic2() {
+        let len = this.width * this.height;
+        let keyNumber = Math.round(Math.random() * len);
+        //console.log(keyNumber);
+
+        let keys = [];
+        for (let i = 0; i < keyNumber; i++) {
+            let key = Math.round(Math.random() * len);
+            keys.push(key);
+        }
+        // TODO: remove this after debugging
+        //keys.sort();
+        //console.log(keys);
+
+        let current_value = 0;
+        for (let i = 0; i < len; i++) {
+            if (i <= this.alpha_threshold) {
+                current_value = 0;
+                this.texture[i*4 + 3] = 0;
+                continue;
+            }
+
+            if (keys.includes(i)) {
+                current_value = Math.round(Math.random() * 255);
+            }
+            this.texture[i*4 + 3] = current_value;
+        }
+    }
+
     generateTextureInRadius(texture, r) {
         // Box-Muller transform + Dropped Coordinates
         const sphereVector = new Float32Array(this.width * this.height * 4 + 2);
@@ -114,11 +143,12 @@ export class TFGeneratedTexture {
 
         for (let i = 0; i < this.texture.length; i++) {
             let elem = Math.round((sphereVector[i] * r) + texture[i]);
-            if (elem > 255 || elem < 0) {
-                this.generateRandomTexture(this.width, this.height);
-                return;
-            }
             this.texture[i] = Math.min(Math.max(elem, 0), 255);
+            if (i % 4 == 3) {
+                if (i / 4 <= this.alpha_threshold) {
+                    this.texture[i] = 0;
+                }
+            }
         }
     }
 

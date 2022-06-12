@@ -12,7 +12,7 @@ export class GenerationContainer extends EventTarget {
 
         this.selectedBox = null;
         // What should radius be?
-        this.radius = 250;
+        this.radius = 1000;
     }
 
     appendTo(object) {
@@ -45,6 +45,7 @@ export class GenerationContainer extends EventTarget {
                 this.boxes[i].deselect();
                 if (i > this.boxes.length / 2) {
                     this.boxes[i].updateTFTextureByRadius(box.transferFunctionTexture.texture, this.radius);
+                    //console.log(this.boxes[i].transferFunctionTexture.texture);
                 } else {
                     this.boxes[i].updateTFTexture();
                 }
@@ -52,7 +53,8 @@ export class GenerationContainer extends EventTarget {
                 boxNum = i;
             }
         }
-        this.radius = Math.max(this.radius * 0.9, 10);
+        //this.radius = Math.max(this.radius * 0.9, 10);
+        //console.log(this.radius);
         this.selectedBox = box;
         box.select();
         
@@ -108,6 +110,7 @@ export class GenerationContainer extends EventTarget {
         }
 
         if (focusedBox) {
+            focusedBox.fullscreen = true;
             for (let box of this.boxes) {
                 box.html.classList.remove("selection-box");
                 if (box != focusedBox) {
@@ -124,6 +127,7 @@ export class GenerationContainer extends EventTarget {
 
     revertFullScreen() {
         for (let box of this.boxes) {
+            box.fullscreen = false;
             box.html.classList.remove("selection-box-minimized");
             box.html.classList.remove("selection-box-fullscreen");
             box.html.classList.add("selection-box");

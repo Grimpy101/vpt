@@ -61,6 +61,8 @@ constructor() {
         this._mainDialog.disableMCC();
     }*/
 
+    this._inFullScreen = false;
+
     window.addEventListener('resize', () => {
         const width = window.innerWidth;
         const height = window.innerHeight;
@@ -132,7 +134,6 @@ constructor() {
 
     this._mouseX = 0;
     this._mouseY = 0;
-    this._inFullScreen = false;
 
     window.addEventListener('mousemove', (e) => {
         this._mouseX = e.pageX;
@@ -148,7 +149,22 @@ constructor() {
         this._createHelperDialog();
     }
     
-    let recommendedVolumeLabel = urlParams.get('volume');
+    /*let recommendedVolumeLabel = urlParams.get('volume');
+    if (recommendedVolumeLabel) {
+        const selection = this._volumeLoadDialog._binds.demo;
+        const select = selection._element.childNodes[1];
+        const options = selection._element.childNodes[1].children;
+        console.log(options);
+        for (let option of options) {
+            console.log(option);
+            if (option.value == recommendedVolumeLabel) {
+                select.value = recommendedVolumeLabel;
+                break;
+            }
+        }
+        select.value = recommendedVolumeLabel;
+        this._volumeLoadDialog._binds.demo.setValue(recommendedVolumeLabel);
+    }*/
 }
 
 _createHelperDialog() {
@@ -273,7 +289,14 @@ _enterFullScreen(e) {
         if (!this._inFullScreen) {
             this._generationContainer.fullScreen(this._mouseX, this._mouseY);
             this._status = "fullscreen";
+            console.log(this._renderingContext._canvas);
+            this._renderingContext._canvas.width = this._renderingContext._canvas.width * 2;
+            this._renderingContext._canvas.height = this._renderingContext._canvas.height * 2;
+            this._renderingContext._canvas.classList.add('canvas_high_res');
         } else {
+            this._renderingContext._canvas.classList.remove('canvas_high_res');
+            this._renderingContext._canvas.width = this._renderingContext._canvas.width / 2;
+            this._renderingContext._canvas.height = this._renderingContext._canvas.height / 2;
             window.dispatchEvent(new Event('change'));
             this._generationContainer.revertFullScreen();
             this._renderingContext.clearCanvas();

@@ -12,6 +12,8 @@ export class SelectionBox {
         this.tfCanvas = document.createElement("canvas");
         this.html.appendChild(this.tfCanvas)
 
+        this.fullscreen = false;
+
         this.html.addEventListener('click', () => {
             if (this.parent.app._status == "ready") {
                 this.parent.updateSelected(this);
