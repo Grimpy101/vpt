@@ -35,7 +35,67 @@ app.post('/store', (req, res) => {
     const fileName = "data/" + name + "_" + today + ".json";
     fs.mkdirSync(path.dirname(fileName), { recursive: true });
     fs.writeFileSync(fileName, JSON.stringify(data));
-    res.status(200).end();
+
+    let json = req.body;
+    let volume = json.volumeID;
+
+    let jsonData = {};
+    if (fs.existsSync('data/info.json')) {
+        let rawData = fs.readFileSync('data/info.json');
+        jsonData = JSON.parse(rawData);
+    } else {
+        jsonData = {
+            "Lobster": 0,
+            "Engine": 0,
+            "Knee": 0,
+            "Body": 0,
+            "Aneurism": 0
+        };
+    }
+
+    if (jsonData.hasOwnProperty(volume)) {
+        jsonData[volume] = jsonData[volume] + 1;
+    }
+    let jsonString = JSON.stringify(jsonData);
+    fs.writeFile('data/info.json', jsonString, () => {});
+    res.status(200).json(jsonData);
+});
+
+function readDataFromFiles() {
+    let data = {};
+    fs.readdir('data', (err, files) => {
+        if (!err) {
+            files.forEach(file => {
+                if (path.extname('data/' + file) == '.json') {
+                    let rawData = fs.readFileSync('data/' + file);
+                    let json = JSON.parse(rawData);
+                    //console.log(json);
+                    let volume = (json.volumeID) ? json.volumeID : "";
+                    console.log(data.hasOwnProperty(volume));
+                    if (data.hasOwnProperty(volume)) {
+                        data[volume] = data[volume] + 1;
+                    } else {
+                        data[volume] = 1;
+                    }
+                    console.log(data[volume]);
+                }
+            });
+        }
+        let jsonString = JSON.stringify(data);
+        fs.writeFile('data/info.json', jsonString, () => {});
+    });
+}
+
+app.get('/volumeInfo', (req, res) => {
+    if (fs.existsSync('data/info.json')) {
+        let rawData = fs.readFileSync('data/info.json');
+        let json = JSON.parse(rawData);
+        res.json(json);
+    } else {
+        let json = readDataFromFiles();
+        fs.writeFile('data/info.json', json, () => {});
+        res.json(json);
+    }
 });
 
 app.listen(app.get('port'), function () {

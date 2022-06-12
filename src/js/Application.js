@@ -141,7 +141,14 @@ constructor() {
 
     window.addEventListener('keydown', this._enterFullScreen);
 
-    this._createHelperDialog();
+    let queryParams = window.location.search;
+    const urlParams = new URLSearchParams(queryParams);
+
+    if (urlParams.get('popup') == null || urlParams.get('popup') == true) {
+        this._createHelperDialog();
+    }
+    
+    let recommendedVolumeLabel = urlParams.get('volume');
 }
 
 _createHelperDialog() {
@@ -237,7 +244,7 @@ _finishTFSelection() {
     tfPackage.choiceHistory = this._generationContainer.history;
 
     if (this._volumeLoadDialog.fileName) {
-        tfPackage.volumeID = this._volumeLoadDialog.fileName;
+        tfPackage.volumeID = this._volumeLoadDialog.fileLabel;
     }
 
     fetch("/store", {
@@ -246,7 +253,17 @@ _finishTFSelection() {
         body: JSON.stringify(tfPackage)
     }).then(res => {
         if (res.ok) {
-            window.location.replace('thanks');
+            let json = res.json().then((data) => {
+                let volume = "";
+                let count = Infinity;
+                for (const candidate in data) {
+                    if (data[candidate] < count) {
+                        count = data[candidate];
+                        volume = candidate;
+                    }
+                }
+                window.location.search = ("?popup=false&volume=" + volume);
+            });
         }
     });
 }

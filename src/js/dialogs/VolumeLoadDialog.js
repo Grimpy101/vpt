@@ -15,6 +15,7 @@ constructor(options) {
 
     this._demos = [];
     this.fileName = "";
+    this.fileLabel = "";
 
     this._addEventListeners();
     this._loadDemoJson();
@@ -101,6 +102,7 @@ _handleLoadDemo() {
     const dimensions = found.dimensions;
     const threshold = found.threshold;
     const scale = (found.scale) ? found.scale : null;
+    this.fileLabel = found.label;
     this.dispatchEvent(new CustomEvent('load', {
         detail: {
             type     : 'url',
