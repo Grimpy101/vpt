@@ -24,7 +24,7 @@ constructor() {
     this._handleRendererChange = this._handleRendererChange.bind(this);
     this._handleToneMapperChange = this._handleToneMapperChange.bind(this);
     this._handleVolumeLoad = this._handleVolumeLoad.bind(this);
-    this._handleEnvmapLoad = this._handleEnvmapLoad.bind(this);
+    //this._handleEnvmapLoad = this._handleEnvmapLoad.bind(this);
 
     this._tfUpdateEverything = this._tfUpdateEverything.bind(this);
     this._enterFullScreen = this._enterFullScreen.bind(this);
@@ -82,9 +82,9 @@ constructor() {
     this._volumeLoadDialog.appendTo(this._mainDialog.getVolumeLoadContainer());
     this._volumeLoadDialog.addEventListener('load', this._handleVolumeLoad);
 
-    this._envmapLoadDialog = new EnvmapLoadDialog();
-    this._envmapLoadDialog.appendTo(this._mainDialog.getEnvmapLoadContainer());
-    this._envmapLoadDialog.addEventListener('load', this._handleEnvmapLoad);
+    //this._envmapLoadDialog = new EnvmapLoadDialog();
+    //this._envmapLoadDialog.appendTo(this._mainDialog.getEnvmapLoadContainer());
+    //this._envmapLoadDialog.addEventListener('load', this._handleEnvmapLoad);
 
     this._renderingContextDialog = new RenderingContextDialog();
     this._renderingContextDialog.appendTo(
